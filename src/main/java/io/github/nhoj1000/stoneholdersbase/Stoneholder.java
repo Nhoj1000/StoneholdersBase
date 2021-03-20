@@ -50,9 +50,15 @@ public class Stoneholder {
     public void removeStone(Stone stone) {
         stones.remove(stone);
         actionBarMessage("Lost " + stone);
+        for(ItemStack i: stone.getPowerMap().keySet())
+            player.getInventory().removeItem(i);
     }
 
     public void actionBarMessage(String message) {
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));
+    }
+
+    public boolean isStoneholder() {
+        return stones.size() > 0;
     }
 }

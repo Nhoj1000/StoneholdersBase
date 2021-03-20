@@ -16,7 +16,7 @@ public class PlayerActivatePower implements Listener {
 
     @EventHandler
     public void onClick(PlayerInteractEvent e) {
-        Stoneholder p = plugin.getStoneholderMap().get(e.getPlayer());
+        Stoneholder p = plugin.getStoneholderMap().get(e.getPlayer().getUniqueId());
         if(p != null) {
             if(e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK)
                 p.useStonePower(e.getItem());
