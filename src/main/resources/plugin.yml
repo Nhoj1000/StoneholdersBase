@@ -1,0 +1,6 @@
+name: StoneholdersBase
+version: ${project.version}
+main: io.github.nhoj1000.stoneholdersbase.StoneholdersBase
+api-version: 1.16
+authors: [ Nhoj1000 ]
+description: Core mod for Stoneholders, has 5 base stones with 3 powers a pop
