@@ -42,8 +42,8 @@ public class StoneSetCommand implements TabExecutor {
 
             if(args.length == 2) {
                 if(args[0].equalsIgnoreCase("clear")) {
-                    map.remove(target.getUniqueId());
-                    target.sendMessage("No longer a stoneholder.");
+                    map.remove(target.getUniqueId()).clearStones();
+                    target.sendMessage("No longer a stoneholder."); //TODO Clean up this mess lmao
                 }
             } else if(args.length == 3) {
                 if(args[0].equalsIgnoreCase("add")) {

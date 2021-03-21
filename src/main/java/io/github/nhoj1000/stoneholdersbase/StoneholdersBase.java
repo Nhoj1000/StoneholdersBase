@@ -5,6 +5,8 @@ import io.github.nhoj1000.stoneholdersbase.events.PlayerActivatePower;
 import io.github.nhoj1000.stoneholdersbase.powers.power.*;
 import io.github.nhoj1000.stoneholdersbase.powers.reality.*;
 import io.github.nhoj1000.stoneholdersbase.powers.soul.*;
+import io.github.nhoj1000.stoneholdersbase.powers.space.*;
+import io.github.nhoj1000.stoneholdersbase.powers.time.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -48,6 +50,14 @@ public final class StoneholdersBase extends JavaPlugin {
         Stone soulStone = new Stone(ChatColor.GOLD + "Soul stone");
         soulStone.registerPowers(new Reveal(50), new AstralForm(this, 5));
         registerStone("soul", soulStone);
+
+        Stone spaceStone = new Stone(ChatColor.BLUE + "Space stone");
+        spaceStone.registerPowers(new Scatter(20, 100), new Dash(30), new Summon(12, 20));
+        registerStone("space", spaceStone);
+
+        Stone timeStone = new Stone(ChatColor.GREEN + "Time stone");
+        timeStone.registerPowers(new Checkpoint(this, 10), new Pause(this, 20, 5));
+        registerStone("time", timeStone);
     }
 
     public void registerStone(String id, Stone stone) {
@@ -65,7 +75,8 @@ public final class StoneholdersBase extends JavaPlugin {
     public static ItemStack getPlayerHead(Player player) {
         ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) skull.getItemMeta();
-        meta.setOwningPlayer(player);
+        if(meta != null)
+            meta.setOwningPlayer(player);
         skull.setItemMeta(meta);
         return skull;
     }

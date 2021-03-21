@@ -54,6 +54,11 @@ public class Stoneholder {
             player.getInventory().removeItem(i);
     }
 
+    public void clearStones() {
+        for(Stone s: stones)
+            removeStone(s);
+    }
+
     public void actionBarMessage(String message) {
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));
     }
