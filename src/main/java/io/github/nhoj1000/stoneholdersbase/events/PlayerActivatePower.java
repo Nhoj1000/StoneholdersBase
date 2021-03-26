@@ -8,20 +8,18 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class PlayerActivatePower implements Listener {
-    StoneholdersBase plugin;
+    private final StoneholdersBase plugin;
 
-    public PlayerActivatePower(StoneholdersBase plugin) {
-        this.plugin = plugin;
+    public PlayerActivatePower() {
+        plugin = StoneholdersBase.getInstance();
     }
 
     @EventHandler
     public void onClick(PlayerInteractEvent e) {
         Stoneholder p = plugin.getStoneholderMap().get(e.getPlayer().getUniqueId());
-        if(p != null) {
-            if(e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                p.useStonePower(e.getItem());
-                e.setCancelled(true);
-            }
-        }
+        if(p != null)
+            if(e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK)
+                if(p.useStonePower(e.getItem()))
+                    e.setCancelled(true);
     }
 }

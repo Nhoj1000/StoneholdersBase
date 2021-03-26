@@ -21,6 +21,11 @@ public class Summon implements Power {
     }
 
     @Override
+    public boolean isSpecial() {
+        return false;
+    }
+
+    @Override
     public int usePower(Player player) {
         Random random = new Random();
         int randX, randZ;

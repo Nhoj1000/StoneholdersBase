@@ -20,9 +20,14 @@ public class Pause implements Power {
     private int radius, time;
     private StoneholdersBase plugin;
 
-    public Pause(StoneholdersBase plugin, int radius, int time) {
+    public Pause(int radius, int time) {
+        plugin = StoneholdersBase.getInstance();
         this.radius = radius;
-        this.plugin = plugin;
+    }
+
+    @Override
+    public boolean isSpecial() {
+        return false;
     }
 
     @Override

@@ -17,10 +17,10 @@ import java.util.*;
  * Usage: /stone [add, remove, clear] [target] [stone]
  */
 public class StoneSetCommand implements TabExecutor {
-    StoneholdersBase plugin;
+    private final StoneholdersBase plugin;
 
-    public StoneSetCommand(StoneholdersBase plugin) {
-        this.plugin = plugin;
+    public StoneSetCommand() {
+        plugin = StoneholdersBase.getInstance();
     }
 
     @Override

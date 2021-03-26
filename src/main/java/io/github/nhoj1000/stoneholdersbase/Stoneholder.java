@@ -6,11 +6,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Stoneholder {
     private final Player player;
-    private final List<Stone> stones = new ArrayList<>();
+    private final Set<Stone> stones = new HashSet<>();
     private final List<Integer> cooldowns = new ArrayList<>();    //TODO add cooldown class
 
     public Stoneholder(Player player) {
@@ -24,17 +26,29 @@ public class Stoneholder {
     /**
      *  Small check to see if the user has access to a certain power associated with a tool
      * @param i Tool to check
+     * @param special false if you want a normal active power, true otherwise (shield, glass bow, etc.)
      * @return  null if user doesn't have power, returns the power otherwise
      */
-    public Power checkTool(ItemStack i) {
-        for(Stone s: stones)
-            if(s.getPowerMap().containsKey(i))
-                return s.getPowerMap().get(i);
+    private Power checkTool(ItemStack i, boolean special) {
+        for(Stone s: stones) {
+            Power temp = s.getPowerMap().get(i);
+            if(temp != null && temp.isSpecial() == special)
+                return temp;
+        }
         return null;
     }
 
-    public void useStonePower(ItemStack i) {
-        Power p = checkTool(i);
+    public boolean useStonePower(ItemStack i) {
+        Power p = checkTool(i, false);
+        if(p != null) {
+            int cooldown = p.usePower(player);
+            return true;
+        }
+        return false;
+    }
+
+    public void useSpecialPower(ItemStack i) {
+        Power p = checkTool(i, true);
         if(p != null) {
             int cooldown = p.usePower(player);
         }
@@ -45,6 +59,8 @@ public class Stoneholder {
         actionBarMessage("Acquired " + stone);
         for(ItemStack i: stone.getPowerMap().keySet())  //TODO ensure no copies of items
             player.getInventory().addItem(i);
+        for(PassivePower p: stone.getPassivePowerSet())
+            p.activatePower(player);
     }
 
     public void removeStone(Stone stone) {
@@ -52,6 +68,8 @@ public class Stoneholder {
         actionBarMessage("Lost " + stone);
         for(ItemStack i: stone.getPowerMap().keySet())
             player.getInventory().removeItem(i);
+        for(PassivePower p: stone.getPassivePowerSet())
+            p.deactivatePower(player);
     }
 
     public void clearStones() {

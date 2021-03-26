@@ -20,6 +20,11 @@ public class TNTWand implements Power {
     }
 
     @Override
+    public boolean isSpecial() {
+        return false;
+    }
+
+    @Override
     public int usePower(Player player) {
         Block block = player.getTargetBlockExact(range);
         if(block == null) {

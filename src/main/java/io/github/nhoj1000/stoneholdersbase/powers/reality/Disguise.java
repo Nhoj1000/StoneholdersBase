@@ -20,10 +20,15 @@ public class Disguise implements Power {
     private static Map<UUID, DisguisedUser> disguisedUsers = new HashMap<>();
     private StoneholdersBase plugin;
 
-    public Disguise(StoneholdersBase plugin, int range, int maxTime) {
-        this.plugin = plugin;
+    public Disguise(int range, int maxTime) {
+        plugin = StoneholdersBase.getInstance();
         this.range = range;
         this.maxTime = maxTime;
+    }
+
+    @Override
+    public boolean isSpecial() {
+        return false;
     }
 
     @Override

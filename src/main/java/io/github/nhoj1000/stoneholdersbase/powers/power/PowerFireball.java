@@ -17,6 +17,11 @@ public class PowerFireball implements Power {
     }
 
     @Override
+    public boolean isSpecial() {
+        return false;
+    }
+
+    @Override
     public int usePower(Player player) {
         Fireball fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().add(player.getEyeLocation().getDirection()), EntityType.FIREBALL);
         fireball.setYield(yield);

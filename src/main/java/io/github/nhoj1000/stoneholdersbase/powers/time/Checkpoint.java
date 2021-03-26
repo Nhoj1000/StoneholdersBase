@@ -15,9 +15,14 @@ public class Checkpoint implements Power {
     private  int recallTime;
     private StoneholdersBase plugin;
 
-    public Checkpoint(StoneholdersBase plugin, int recallTime) {
+    public Checkpoint( int recallTime) {
+        plugin = StoneholdersBase.getInstance();
         this.recallTime = recallTime;
-        this.plugin = plugin;
+    }
+
+    @Override
+    public boolean isSpecial() {
+        return false;
     }
 
     @Override

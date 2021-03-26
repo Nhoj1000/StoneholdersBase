@@ -21,6 +21,11 @@ public class Reveal implements Power {
     }
 
     @Override
+    public boolean isSpecial() {
+        return false;
+    }
+
+    @Override
     public int usePower(Player player) {
         List<Entity> nearby = player.getNearbyEntities(radius, radius, radius);
         for (Entity ent : nearby)

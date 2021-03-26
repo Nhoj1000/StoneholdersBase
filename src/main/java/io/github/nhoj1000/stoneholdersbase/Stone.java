@@ -6,11 +6,14 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class Stone {
     private final Map<ItemStack, Power> powerMap = new HashMap<>();
-    private String stoneName;
+    private final Set<PassivePower> passivePowerSet = new HashSet<>();
+    private final String stoneName;
 
     public Stone(String stoneName) {
         this.stoneName = stoneName;
@@ -21,8 +24,17 @@ public class Stone {
             powerMap.put(p.getTool(), p);
     }
 
+    public void registerPassivePowers(PassivePower... powers) {
+        for(PassivePower p: powers)
+            passivePowerSet.add(p);
+    }
+
     public Map<ItemStack, Power> getPowerMap() {
         return powerMap;
+    }
+
+    public Set<PassivePower> getPassivePowerSet() {
+        return passivePowerSet;
     }
 
     public String toString() {

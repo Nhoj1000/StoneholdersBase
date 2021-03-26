@@ -11,6 +11,11 @@ import org.bukkit.potion.PotionEffectType;
 
 public class Powerup implements Power {
     @Override
+    public boolean isSpecial() {
+        return false;
+    }
+
+    @Override
     public int usePower(Player player) {
         player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 160, 2));
         player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 160, 1));

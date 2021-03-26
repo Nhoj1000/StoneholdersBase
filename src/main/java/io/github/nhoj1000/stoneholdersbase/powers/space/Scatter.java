@@ -22,6 +22,11 @@ public class Scatter implements Power {
     }
 
     @Override
+    public boolean isSpecial() {
+        return false;
+    }
+
+    @Override
     public int usePower(Player player) {
         World world = player.getWorld();
         Location center = world.getWorldBorder().getCenter();

@@ -15,9 +15,14 @@ public class AstralForm implements Power {
     private static int astralTime;
     StoneholdersBase plugin;
 
-    public AstralForm(StoneholdersBase plugin, int astralTime) {
+    public AstralForm(int astralTime) {
+        plugin = StoneholdersBase.getInstance();
         this.astralTime = astralTime;
-        this.plugin = plugin;
+    }
+
+    @Override
+    public boolean isSpecial() {
+        return false;
     }
 
     @Override

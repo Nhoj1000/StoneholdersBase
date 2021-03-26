@@ -2,6 +2,8 @@ package io.github.nhoj1000.stoneholdersbase;
 
 import io.github.nhoj1000.stoneholdersbase.commands.StoneSetCommand;
 import io.github.nhoj1000.stoneholdersbase.events.PlayerActivatePower;
+import io.github.nhoj1000.stoneholdersbase.events.PlayerDamagedByEntity;
+import io.github.nhoj1000.stoneholdersbase.events.PlayerDeath;
 import io.github.nhoj1000.stoneholdersbase.powers.power.*;
 import io.github.nhoj1000.stoneholdersbase.powers.reality.*;
 import io.github.nhoj1000.stoneholdersbase.powers.soul.*;
@@ -23,32 +25,35 @@ public final class StoneholdersBase extends JavaPlugin {
     private final Map<UUID, Stoneholder> stoneholderMap = new HashMap<>();
     private final Map<String, Stone> stones = new HashMap<>();
 
+    private static StoneholdersBase plugin;
+
 
     @Override
     public void onEnable() {
-        PluginManager pm = getServer().getPluginManager();
-        pm.registerEvents(new PlayerActivatePower(this), this);
+        plugin = this;
 
-        getCommand("stone").setExecutor(new StoneSetCommand(this));
+        PluginManager pm = getServer().getPluginManager();
+        pm.registerEvents(new PlayerActivatePower(), this);
+        pm.registerEvents(new PlayerDamagedByEntity(), this);
+        pm.registerEvents(new PlayerDeath(), this);
+
+        getCommand("stone").setExecutor(new StoneSetCommand());
 
         stoneSetup();
     }
 
-    public Map<UUID, Stoneholder> getStoneholderMap() {
-        return stoneholderMap;
-    }
-
     private void stoneSetup() {
         Stone powerStone = new Stone(ChatColor.DARK_PURPLE + "Power stone");
-        powerStone.registerPowers(new PowerFireball(3), new Powerup());
+        powerStone.registerPowers(new PowerFireball(3), new Powerup(), new PowerShield(10, 1.5));
         registerStone("power", powerStone);
 
         Stone realityStone = new Stone(ChatColor.RED + "Reality stone");
-        realityStone.registerPowers(new TNTWand(30, 15), new Disguise(this, 30, 5));
+        realityStone.registerPowers(new TNTWand(30, 15), new Disguise(30, 5));
         registerStone("reality", realityStone);
 
         Stone soulStone = new Stone(ChatColor.GOLD + "Soul stone");
-        soulStone.registerPowers(new Reveal(50), new AstralForm(this, 5));
+        soulStone.registerPowers(new Reveal(50), new AstralForm(5));
+        soulStone.registerPassivePowers(new SoulCollector(20, 1, 4, 8));
         registerStone("soul", soulStone);
 
         Stone spaceStone = new Stone(ChatColor.BLUE + "Space stone");
@@ -56,7 +61,7 @@ public final class StoneholdersBase extends JavaPlugin {
         registerStone("space", spaceStone);
 
         Stone timeStone = new Stone(ChatColor.GREEN + "Time stone");
-        timeStone.registerPowers(new Checkpoint(this, 10), new Pause(this, 20, 5));
+        timeStone.registerPowers(new Checkpoint(10), new Pause(20, 5), new TimeShield(10, 2));
         registerStone("time", timeStone);
     }
 
@@ -72,6 +77,10 @@ public final class StoneholdersBase extends JavaPlugin {
         return stones;
     }
 
+    public Map<UUID, Stoneholder> getStoneholderMap() {
+        return stoneholderMap;
+    }
+
     public static ItemStack getPlayerHead(Player player) {
         ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) skull.getItemMeta();
@@ -79,5 +88,9 @@ public final class StoneholdersBase extends JavaPlugin {
             meta.setOwningPlayer(player);
         skull.setItemMeta(meta);
         return skull;
+    }
+
+    public static StoneholdersBase getInstance() {
+        return plugin;
     }
 }

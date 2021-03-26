@@ -21,6 +21,11 @@ public class Dash implements Power {
     }
 
     @Override
+    public boolean isSpecial() {
+        return false;
+    }
+
+    @Override
     public int usePower(Player player) {
         List<Block> target = player.getLastTwoTargetBlocks(null, dashDistance);
         List<Entity> rider = player.getNearbyEntities(0.5, 1, 0.5);
