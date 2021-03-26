@@ -12,8 +12,8 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.Collection;
 
 public class Checkpoint implements Power {
-    private  int recallTime;
-    private StoneholdersBase plugin;
+    private final int recallTime;
+    private final StoneholdersBase plugin;
 
     public Checkpoint( int recallTime) {
         plugin = StoneholdersBase.getInstance();
@@ -53,7 +53,7 @@ public class Checkpoint implements Power {
                 for (PotionEffect effect : potions)
                     player.addPotionEffect(effect);
             }, 1L);
-        }, recallTime * 20);
+        }, recallTime * 20L);
 
         return 1;
     }

@@ -13,11 +13,9 @@ import org.bukkit.potion.PotionEffectType;
 
 public class AstralForm implements Power {
     private static int astralTime;
-    StoneholdersBase plugin;
 
     public AstralForm(int astralTime) {
-        plugin = StoneholdersBase.getInstance();
-        this.astralTime = astralTime;
+        AstralForm.astralTime = astralTime;
     }
 
     @Override
@@ -35,26 +33,24 @@ public class AstralForm implements Power {
         place.setVelocity(player.getVelocity());
         place.setAware(false);
         place.setSilent(true);
-        place.setBaby(false);
+        place.setBaby();
         place.setHealth(player.getHealth());
         place.getEquipment().setItemInMainHand(player.getEquipment().getItemInMainHand());
         place.getEquipment().setItemInOffHand(player.getEquipment().getItemInOffHand());
         place.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 0, false, false));
         player.sendMessage(ChatColor.GOLD + "Astral form active for " + astralTime + " seconds!");
-
         player.setGameMode(GameMode.SPECTATOR);
 
-        Chunk chunk = place.getLocation().getChunk();
-        chunk.load(true);
+        place.getLocation().getChunk().load(true);
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        Bukkit.getScheduler().runTaskLater(StoneholdersBase.getInstance(), () -> {
             player.sendMessage(ChatColor.GOLD + "Leaving Astral form!");
             player.teleport(place);
             player.setGameMode(GameMode.SURVIVAL);
             player.setVelocity(place.getVelocity());
             player.setHealth(place.getHealth());
             place.remove();
-        }, astralTime * 20);
+        }, astralTime * 20L);
 
         return 0;
     }

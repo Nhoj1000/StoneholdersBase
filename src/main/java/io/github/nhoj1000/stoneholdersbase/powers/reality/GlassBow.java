@@ -1,21 +1,26 @@
 package io.github.nhoj1000.stoneholdersbase.powers.reality;
 
+import io.github.nhoj1000.stoneholdersbase.PassivePower;
 import io.github.nhoj1000.stoneholdersbase.Power;
 import io.github.nhoj1000.stoneholdersbase.Stone;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import io.github.nhoj1000.stoneholdersbase.StoneholdersBase;
+import org.bukkit.*;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
 import java.util.UUID;
 
-public class GlassBow implements Power {
-    public static HashMap<UUID, Entity> targetMap = new HashMap<>();
+public class GlassBow implements Power, PassivePower {
+    private static HashMap<UUID, Tagged> targetMap = new HashMap<>();
+    private static int decayDelay;
+
+    public GlassBow(int decayDelay) {
+        this.decayDelay = decayDelay;
+    }
 
     @Override
     public boolean isSpecial() {
@@ -24,23 +29,48 @@ public class GlassBow implements Power {
 
     @Override
     public int usePower(Player player) {
-        Entity targetEntity = targetMap.remove(player.getUniqueId());
-        if(targetEntity != null) {
+        Tagged temp = targetMap.get(player.getUniqueId());
+        if(temp != null) {
+            Entity targetEntity = temp.entity;
+            temp.task.cancel();
+            targetMap.put(player.getUniqueId(), null);
             generateSphere(targetEntity.getLocation(), 4, Material.GLASS);
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 10, 1);
 
             if(targetEntity instanceof Arrow)
                 targetEntity.remove();
-
             return 1;
         }
-
         return -1;
     }
 
     @Override
     public ItemStack getTool() {
         return Stone.generateStoneTool(Material.BOW, 2, "Glass Bow");
+    }
+
+    public static void setTarget(Player shooter, Entity target, boolean verbose) {
+        if(targetMap.containsKey(shooter.getUniqueId())) {
+            Tagged temp = new Tagged();
+            temp.entity = target;
+            temp.task = Bukkit.getScheduler().runTaskLater(StoneholdersBase.getInstance(),
+                    () -> clearTarget(shooter, true), 20 * decayDelay);
+            targetMap.put(shooter.getUniqueId(), temp);
+
+            if(verbose)
+                if (target instanceof Player)
+                    target.sendMessage(ChatColor.DARK_RED + "Tagged " + target.getName());
+                else
+                    shooter.sendMessage(ChatColor.DARK_RED + "Tagged a " + target.getType());
+        }
+
+
+    }
+
+    public static void clearTarget(Player shooter, boolean verbose) {
+        targetMap.put(shooter.getUniqueId(), null);
+        if(verbose)
+            shooter.sendMessage(ChatColor.DARK_RED + "Tag expired");
     }
 
     public static void generateSphere(Location loc, int radius, Material material) {
@@ -58,5 +88,20 @@ public class GlassBow implements Power {
                             new Location(world, x, y, z).getBlock().setType(material);
                 }
 
+    }
+
+    @Override
+    public void activatePower(Player p) {
+        targetMap.put(p.getUniqueId(), null);
+    }
+
+    @Override
+    public void deactivatePower(Player p) {
+        targetMap.remove(p.getUniqueId());
+    }
+
+    private static class Tagged {
+        public BukkitTask task;
+        public Entity entity;
     }
 }

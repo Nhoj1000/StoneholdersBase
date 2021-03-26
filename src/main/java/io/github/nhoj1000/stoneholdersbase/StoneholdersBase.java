@@ -1,8 +1,9 @@
 package io.github.nhoj1000.stoneholdersbase;
 
 import io.github.nhoj1000.stoneholdersbase.commands.StoneSetCommand;
+import io.github.nhoj1000.stoneholdersbase.events.BowShootEvent;
 import io.github.nhoj1000.stoneholdersbase.events.PlayerActivatePower;
-import io.github.nhoj1000.stoneholdersbase.events.PlayerDamagedByEntity;
+import io.github.nhoj1000.stoneholdersbase.events.EntityDamagedByEntity;
 import io.github.nhoj1000.stoneholdersbase.events.PlayerDeath;
 import io.github.nhoj1000.stoneholdersbase.powers.power.*;
 import io.github.nhoj1000.stoneholdersbase.powers.reality.*;
@@ -22,8 +23,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public final class StoneholdersBase extends JavaPlugin {
-    private final Map<UUID, Stoneholder> stoneholderMap = new HashMap<>();
-    private final Map<String, Stone> stones = new HashMap<>();
+    private static final Map<UUID, Stoneholder> stoneholderMap = new HashMap<>();
+    private static final Map<String, Stone> stones = new HashMap<>();
 
     private static StoneholdersBase plugin;
 
@@ -34,8 +35,9 @@ public final class StoneholdersBase extends JavaPlugin {
 
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new PlayerActivatePower(), this);
-        pm.registerEvents(new PlayerDamagedByEntity(), this);
+        pm.registerEvents(new EntityDamagedByEntity(), this);
         pm.registerEvents(new PlayerDeath(), this);
+        pm.registerEvents(new BowShootEvent(), this);
 
         getCommand("stone").setExecutor(new StoneSetCommand());
 
@@ -48,7 +50,9 @@ public final class StoneholdersBase extends JavaPlugin {
         registerStone("power", powerStone);
 
         Stone realityStone = new Stone(ChatColor.RED + "Reality stone");
-        realityStone.registerPowers(new TNTWand(30, 15), new Disguise(30, 5));
+        GlassBow gb = new GlassBow(300);
+        realityStone.registerPowers(new TNTWand(30, 15), new Disguise(30, 5), gb);
+        realityStone.registerPassivePowers(gb);
         registerStone("reality", realityStone);
 
         Stone soulStone = new Stone(ChatColor.GOLD + "Soul stone");
@@ -69,15 +73,15 @@ public final class StoneholdersBase extends JavaPlugin {
         stones.put(id, stone);
     }
 
-    public Stone getStone(String id) {
+    public static Stone getStone(String id) {
         return stones.get(id);
     }
 
-    public Map<String, Stone> getStones() {
+    public static Map<String, Stone> getStones() {
         return stones;
     }
 
-    public Map<UUID, Stoneholder> getStoneholderMap() {
+    public static Map<UUID, Stoneholder> getStoneholderMap() {
         return stoneholderMap;
     }
 

@@ -18,10 +18,8 @@ import java.util.*;
 public class Disguise implements Power {
     private static int range, maxTime;
     private static Map<UUID, DisguisedUser> disguisedUsers = new HashMap<>();
-    private StoneholdersBase plugin;
 
     public Disguise(int range, int maxTime) {
-        plugin = StoneholdersBase.getInstance();
         this.range = range;
         this.maxTime = maxTime;
     }
@@ -50,7 +48,8 @@ public class Disguise implements Power {
             user.block.setType(target.getType());
             player.teleport(user.block.getLocation().add(0.5, 0.5, 0.5)
                     .setDirection(player.getLocation().getDirection()));
-            user.task = Bukkit.getScheduler().runTaskLater(plugin, () -> unDisguise(player), maxTime * 20);
+            user.task = Bukkit.getScheduler().runTaskLater(StoneholdersBase.getInstance(),
+                    () -> unDisguise(player), maxTime * 20);
             disguisedUsers.put(player.getUniqueId(), user);
         } else {
             unDisguise(player);
