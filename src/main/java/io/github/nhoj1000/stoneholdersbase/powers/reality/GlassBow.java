@@ -11,15 +11,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 public class GlassBow implements Power, PassivePower {
     private static HashMap<UUID, Tagged> targetMap = new HashMap<>();
     private static int decayDelay;
 
     public GlassBow(int decayDelay) {
-        this.decayDelay = decayDelay;
+        GlassBow.decayDelay = decayDelay;
     }
 
     @Override
@@ -51,15 +50,19 @@ public class GlassBow implements Power, PassivePower {
 
     public static void setTarget(Player shooter, Entity target, boolean verbose) {
         if(targetMap.containsKey(shooter.getUniqueId())) {
-            Tagged temp = new Tagged();
+            Tagged temp = targetMap.get(shooter.getUniqueId());
+            if(temp == null)
+                temp = new Tagged();
+            else
+                temp.task.cancel();
             temp.entity = target;
             temp.task = Bukkit.getScheduler().runTaskLater(StoneholdersBase.getInstance(),
-                    () -> clearTarget(shooter, true), 20 * decayDelay);
+                    () -> clearTarget(shooter, true), 20L * decayDelay);
             targetMap.put(shooter.getUniqueId(), temp);
 
             if(verbose)
                 if (target instanceof Player)
-                    target.sendMessage(ChatColor.DARK_RED + "Tagged " + target.getName());
+                    shooter.sendMessage(ChatColor.DARK_RED + "Tagged " + target.getName());
                 else
                     shooter.sendMessage(ChatColor.DARK_RED + "Tagged a " + target.getType());
         }
@@ -103,5 +106,10 @@ public class GlassBow implements Power, PassivePower {
     private static class Tagged {
         public BukkitTask task;
         public Entity entity;
+    }
+
+    @Override
+    public Set<ItemStack> getItems() {
+        return new HashSet<>(Arrays.asList(getTool(), new ItemStack(Material.ARROW, 10)));
     }
 }

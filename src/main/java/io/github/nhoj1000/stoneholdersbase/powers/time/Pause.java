@@ -8,21 +8,21 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Pause implements Power {
-    private int radius, time;
-    private StoneholdersBase plugin;
+    private static final Set<Entity> frozenEntities = new HashSet<>();
+
+    private final int radius, time;
 
     public Pause(int radius, int time) {
-        plugin = StoneholdersBase.getInstance();
         this.radius = radius;
+        this.time = time;
     }
 
     @Override
@@ -33,27 +33,29 @@ public class Pause implements Power {
     @Override
     public int usePower(Player player) {
         player.sendMessage(ChatColor.GREEN + "Time Pause activated for " + time + " seconds!");
-        List<Entity> ents = player.getNearbyEntities(radius, radius, radius);
+        List<Entity> entities = player.getNearbyEntities(radius, radius, radius);
         Map<Entity, Vector> speeds = new HashMap<>();
 
-        for (Entity ent : ents) {
-            if (ent instanceof Player) {
-                ent.addAttachment(plugin).setPermission("stoneholders.frozen", true);
-                ((Player) ent).setAllowFlight(true);
-            }
-            speeds.put(ent, ent.getVelocity());
-            ent.setVelocity(new Vector(0, 0, 0));
-            ent.setGravity(false);
+        for (Entity e : entities) {
+            if (e instanceof LivingEntity)
+                ((LivingEntity) e).setAI(false);
+            if(e instanceof Player)
+                ((Player) e).setAllowFlight(true);
+            frozenEntities.add(e);
+            speeds.put(e, e.getVelocity());
+            e.setVelocity(new Vector(0, 0, 0));
+            e.setGravity(false);
         }
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            for (Entity ent : ents) {
-                ent.setGravity(true);
-                if (ent instanceof Player) {
-                    ent.addAttachment(plugin).setPermission("stoneholders.frozen", false);  //TODO swap gross perms out for a static set
-                    ((Player) ent).setAllowFlight(((Player) ent).getGameMode() != GameMode.SURVIVAL);
-                }
-                ent.setVelocity(speeds.remove(ent));
+        Bukkit.getScheduler().runTaskLater(StoneholdersBase.getInstance(), () -> {
+            for (Entity e : entities) {
+                e.setGravity(true);
+                if (e instanceof LivingEntity)
+                    ((LivingEntity) e).setAI(true);
+                if(e instanceof Player)
+                    ((Player) e).setAllowFlight(((Player) e).getGameMode() != GameMode.SURVIVAL);
+                frozenEntities.remove(e);
+                e.setVelocity(speeds.remove(e));
             }
             player.sendMessage(ChatColor.GREEN + "Time Pause deactivated!");
         }, time * 20L);
@@ -64,5 +66,21 @@ public class Pause implements Power {
     @Override
     public ItemStack getTool() {
         return Stone.generateStoneTool(Material.GOLDEN_SHOVEL, 5, "Pause");
+    }
+
+    @Override
+    public Set<ItemStack> getItems() {
+        return new HashSet<>(Collections.singletonList(getTool()));
+    }
+
+    public static void setFrozen(Entity e, boolean frozen) {
+        if(frozen)
+            frozenEntities.add(e);
+        else
+            frozenEntities.remove(e);
+    }
+
+    public static boolean isFrozen(Entity e) {
+        return frozenEntities.contains(e);
     }
 }

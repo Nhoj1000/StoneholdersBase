@@ -11,13 +11,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.List;
+import java.util.*;
 
 public class Reveal implements Power {
     private static int radius;
 
     public Reveal(int radius) {
-        this.radius = radius;
+        Reveal.radius = radius;
     }
 
     @Override
@@ -41,5 +41,10 @@ public class Reveal implements Power {
     @Override
     public ItemStack getTool() {
         return Stone.generateStoneTool(Material.DIAMOND_SHOVEL, 3, "Reveal");
+    }
+
+    @Override
+    public Set<ItemStack> getItems() {
+        return new HashSet<>(Collections.singletonList(getTool()));
     }
 }

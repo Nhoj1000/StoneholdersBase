@@ -20,8 +20,8 @@ public class Disguise implements Power {
     private static Map<UUID, DisguisedUser> disguisedUsers = new HashMap<>();
 
     public Disguise(int range, int maxTime) {
-        this.range = range;
-        this.maxTime = maxTime;
+        Disguise.range = range;
+        Disguise.maxTime = maxTime;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class Disguise implements Power {
             player.teleport(user.block.getLocation().add(0.5, 0.5, 0.5)
                     .setDirection(player.getLocation().getDirection()));
             user.task = Bukkit.getScheduler().runTaskLater(StoneholdersBase.getInstance(),
-                    () -> unDisguise(player), maxTime * 20);
+                    () -> unDisguise(player), maxTime * 20L);
             disguisedUsers.put(player.getUniqueId(), user);
         } else {
             unDisguise(player);
@@ -75,5 +75,10 @@ public class Disguise implements Power {
         public Block block;
         public Material material;
         public BukkitTask task;
+    }
+
+    @Override
+    public Set<ItemStack> getItems() {
+        return new HashSet<>(Collections.singletonList(getTool()));
     }
 }

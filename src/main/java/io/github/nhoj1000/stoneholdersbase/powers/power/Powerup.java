@@ -9,6 +9,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 public class Powerup implements Power {
     @Override
     public boolean isSpecial() {
@@ -28,5 +33,10 @@ public class Powerup implements Power {
     @Override
     public ItemStack getTool() {
         return Stone.generateStoneTool(Material.GOLDEN_SHOVEL, 1, "Powerup");
+    }
+
+    @Override
+    public Set<ItemStack> getItems() {
+        return new HashSet<>(Collections.singletonList(getTool()));
     }
 }

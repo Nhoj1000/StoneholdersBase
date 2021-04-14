@@ -9,11 +9,16 @@ import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 public class PowerFireball implements Power {
     private static int yield;
 
     public PowerFireball(int yield) {
-        this.yield = yield;
+        PowerFireball.yield = yield;
     }
 
     @Override
@@ -33,5 +38,10 @@ public class PowerFireball implements Power {
     @Override
     public ItemStack getTool() {
         return Stone.generateStoneTool(Material.DIAMOND_SHOVEL, 1, "Fireball");
+    }
+
+    @Override
+    public Set<ItemStack> getItems() {
+        return new HashSet<>(Collections.singletonList(getTool()));
     }
 }

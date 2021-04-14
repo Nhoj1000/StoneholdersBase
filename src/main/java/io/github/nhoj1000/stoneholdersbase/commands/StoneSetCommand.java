@@ -17,69 +17,63 @@ import java.util.*;
  * Usage: /stone [add, remove, clear] [target] [stone]
  */
 public class StoneSetCommand implements TabExecutor {
-    private final StoneholdersBase plugin;
-
-    public StoneSetCommand() {
-        plugin = StoneholdersBase.getInstance();
-    }
-
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(sender instanceof Player) {
-            Player user = (Player) sender;
-            Player target = null;
-            Stoneholder temp;
+        Player target;
 
-            if(args.length > 1) {
-                target = Bukkit.getPlayer(args[1]);
-                if (target == null) {
-                    user.sendMessage(ChatColor.RED + "Player not found!");
+        if(args.length > 1) {   //Ensures 2 args entered
+            if ((target = Bukkit.getPlayer(args[1])) == null) //Finds target player
+                return informAndReturn(sender, ChatColor.RED + "Target not found!", true);
+            Stoneholder s = StoneholdersBase.getStoneholder(target);
+
+            if (args.length == 2) { //clear and list commands
+                if (s == null)
+                    return informAndReturn(sender,ChatColor.RED + "Target is not a stoneholder!", true);
+
+                if (args[0].equals("clear")) {
+                    s.clearStones();
+                    StoneholdersBase.setStoneholder(target, false);
+                    return informAndReturn(sender, "Target's stones have been cleared.", true);
+                } else if (args[0].equals("list")) {
+                    StringBuilder key = new StringBuilder(target.getName() + "'s stones:\n");
+                    for(Stone tempStone: s.getStones())
+                        key.append(ChatColor.WHITE).append("> ").append(tempStone).append("\n");
+                    return informAndReturn(sender, key.toString(), true);
+                }
+            } else if (args.length == 3) {  //add and remove commands
+                Stone stone = StoneholdersBase.getStone(args[2]);
+                if (stone == null)
+                    return informAndReturn(sender, ChatColor.RED + "Stone not found!", true);
+
+                if (args[0].equals("add")) {
+                    if (s == null) {
+                        s = StoneholdersBase.setStoneholder(target, true);
+                        sender.sendMessage(target.getName() + " is now a stoneholder.");
+                    }
+                    s.addStone(stone);
+                    return true;
+                } else if (args[0].equals("remove")) {
+                    if (s == null)
+                        return informAndReturn(sender, ChatColor.RED + "Target is not a stoneholder!", true);
+                    s.removeStone(stone);
+                    if (!s.isStoneholder()) {
+                        StoneholdersBase.setStoneholder(target, false);
+                        return informAndReturn(sender, target.getName() + " is no longer a stoneholder.", true);
+                    }
                     return true;
                 }
             }
-
-            Map<UUID, Stoneholder> map = plugin.getStoneholderMap();
-
-            if(args.length == 2) {
-                if(args[0].equalsIgnoreCase("clear")) {
-                    map.remove(target.getUniqueId()).clearStones();
-                    target.sendMessage("No longer a stoneholder."); //TODO Clean up this mess lmao
-                }
-            } else if(args.length == 3) {
-                if(args[0].equalsIgnoreCase("add")) {
-                    Stone stone = plugin.getStone(args[2]);
-                    if (stone != null) {
-                        temp = map.get(target.getUniqueId());
-                        if(temp == null)
-                            temp = new Stoneholder(target);
-                        temp.addStone(stone);
-                        map.putIfAbsent(target.getUniqueId(), temp);
-                    }
-                } else if(args[0].equalsIgnoreCase("remove")) {
-                    Stone stone = plugin.getStone(args[2]);
-                    if (stone != null) {
-                        temp = map.get(target.getUniqueId());
-                        if(temp != null) {
-                            temp.removeStone(stone);
-                            if(!temp.isStoneholder())
-                                map.remove(target.getUniqueId());
-                        }
-                    }
-                } else
-                    return false;
-            } else
-                return false;
         }
-        return true;
+        return false;
     }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         switch (args.length) {
             case 1:
-                return trimList(Arrays.asList("add", "remove", "clear"), args[0]);
+                return trimList(Arrays.asList("add", "remove", "clear", "list"), args[0]);
             case 3:
-                return trimList(new ArrayList<>(plugin.getStones().keySet()), args[2]);
+                return trimList(new ArrayList<>(StoneholdersBase.getStones().keySet()), args[2]);
             default:
                 return null;
         }
@@ -93,5 +87,10 @@ public class StoneSetCommand implements TabExecutor {
                 i--;
             }
         return listCopy;
+    }
+
+    private boolean informAndReturn(CommandSender sender, String message, boolean returnValue) {
+        sender.sendMessage(message);
+        return returnValue;
     }
 }

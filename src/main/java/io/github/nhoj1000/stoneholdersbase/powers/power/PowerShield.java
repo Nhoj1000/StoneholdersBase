@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import java.util.List;
+import java.util.*;
 
 public class PowerShield implements Power {
     private final int radius;
@@ -39,5 +39,10 @@ public class PowerShield implements Power {
     @Override
     public ItemStack getTool() {
         return Stone.generateStoneTool(Material.SHIELD, 1, "Power Shield");
+    }
+
+    @Override
+    public Set<ItemStack> getItems() {
+        return new HashSet<>(Collections.singletonList(getTool()));
     }
 }

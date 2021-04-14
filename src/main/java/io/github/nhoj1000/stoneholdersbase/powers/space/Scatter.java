@@ -9,8 +9,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Scatter implements Power {
     private  int grabRange, scatterRange;
@@ -52,5 +51,10 @@ public class Scatter implements Power {
 
     private int limit(int i, int min, int max) {
         return Math.max(min, Math.min(i, max));
+    }
+
+    @Override
+    public Set<ItemStack> getItems() {
+        return new HashSet<>(Collections.singletonList(getTool()));
     }
 }

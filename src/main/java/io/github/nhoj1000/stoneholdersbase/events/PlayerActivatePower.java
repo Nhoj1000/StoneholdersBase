@@ -13,17 +13,17 @@ public class PlayerActivatePower implements Listener {
 
     @EventHandler
     public void onRightClick(PlayerInteractEvent e) {
-        Stoneholder p = StoneholdersBase.getStoneholderMap().get(e.getPlayer().getUniqueId());
-        if(p != null)
+        Stoneholder s = StoneholdersBase.getStoneholder(e.getPlayer());
+        if(s != null)
             if(e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK)
-                if(p.useStonePower(e.getItem()))
+                if(s.useNormalPower(e.getItem()))
                     e.setCancelled(true);
     }
 
     @EventHandler
     public void onLeftClick(PlayerAnimationEvent e) {
         Player p = e.getPlayer();
-        Stoneholder s = StoneholdersBase.getStoneholderMap().get(p.getUniqueId());
+        Stoneholder s = StoneholdersBase.getStoneholder(p);
         if(s != null)
             s.useSpecialPower(p.getInventory().getItemInMainHand());
     }

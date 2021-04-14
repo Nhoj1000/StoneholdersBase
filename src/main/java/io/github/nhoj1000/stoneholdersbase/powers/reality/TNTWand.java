@@ -11,12 +11,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 public class TNTWand implements Power {
     private static int range, yield;
 
     public TNTWand(int range, int yield) {
-        this.range = range; //30
-        this.yield = yield; //15
+        TNTWand.range = range; //30
+        TNTWand.yield = yield; //15
     }
 
     @Override
@@ -43,5 +48,10 @@ public class TNTWand implements Power {
     @Override
     public ItemStack getTool() {
         return Stone.generateStoneTool(Material.DIAMOND_SHOVEL, 2, "TNT Wand");
+    }
+
+    @Override
+    public Set<ItemStack> getItems() {
+        return new HashSet<>(Collections.singletonList(getTool()));
     }
 }

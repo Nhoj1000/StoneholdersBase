@@ -5,15 +5,12 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Stoneholder {
     private final Player player;
     private final Set<Stone> stones = new HashSet<>();
-    private final List<Integer> cooldowns = new ArrayList<>();    //TODO add cooldown class
+    private final List<Integer> cooldowns = new ArrayList<>();    //TODO add cooldowns
 
     public Stoneholder(Player player) {
         this.player = player;
@@ -38,7 +35,7 @@ public class Stoneholder {
         return null;
     }
 
-    public boolean useStonePower(ItemStack i) {
+    public boolean useNormalPower(ItemStack i) {
         Power p = checkTool(i, false);
         if(p != null) {
             int cooldown = p.usePower(player);
@@ -55,26 +52,41 @@ public class Stoneholder {
     }
 
     public void addStone(Stone stone) {
-        stones.add(stone);
-        actionBarMessage("Acquired " + stone);
-        for(ItemStack i: stone.getPowerMap().keySet())  //TODO ensure no copies of items
-            player.getInventory().addItem(i);
-        for(PassivePower p: stone.getPassivePowerSet())
-            p.activatePower(player);
+        if(!stones.contains(stone)) {
+            stones.add(stone);
+            actionBarMessage("Acquired " + stone);
+            for (ItemStack i : stone.getPowerMap().keySet())  //TODO ensure no copies of items
+                player.getInventory().addItem(i);
+            for (PassivePower p : stone.getPassivePowerSet())
+                p.activatePower(player);
+        }
     }
 
     public void removeStone(Stone stone) {
-        stones.remove(stone);
-        actionBarMessage("Lost " + stone);
-        for(ItemStack i: stone.getPowerMap().keySet())
-            player.getInventory().removeItem(i);
-        for(PassivePower p: stone.getPassivePowerSet())
-            p.deactivatePower(player);
+        if(stones.contains(stone)) {
+            stones.remove(stone);
+            actionBarMessage("Lost " + stone);
+            for (ItemStack i : stone.getPowerMap().keySet())
+                player.getInventory().removeItem(i);
+            for (PassivePower p : stone.getPassivePowerSet())
+                p.deactivatePower(player);
+        }
     }
 
     public void clearStones() {
-        for(Stone s: stones)
-            removeStone(s);
+        Iterator<Stone> iterator = stones.iterator();
+        while (iterator.hasNext()) {
+            Stone stone = iterator.next();
+            for (ItemStack i : stone.getPowerMap().keySet())
+                player.getInventory().removeItem(i);
+            for (PassivePower p : stone.getPassivePowerSet())
+                p.deactivatePower(player);
+            iterator.remove();
+        }
+    }
+
+    public Set<Stone> getStones() {
+        return stones;
     }
 
     public void actionBarMessage(String message) {

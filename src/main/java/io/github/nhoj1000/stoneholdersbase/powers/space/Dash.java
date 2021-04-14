@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import java.util.List;
+import java.util.*;
 
 public class Dash implements Power {
     private int dashDistance;
@@ -35,7 +35,7 @@ public class Dash implements Power {
         if (target.get(1).getLocation().add(0, 1, 0).getBlock().getType().equals(Material.AIR) && target.get(1).getLocation().add(0, 2, 0).getBlock().getType().equals(Material.AIR))
             destination = target.get(1).getLocation().add(0, 1, 0);
         else
-            destination = target.get(0).getLocation();
+            destination = target.get(0).getLocation().subtract(0, .5, 0);
 
         destination.setDirection(player.getLocation().getDirection());
         player.sendMessage(ChatColor.BLUE + "Whoosh!");
@@ -52,5 +52,10 @@ public class Dash implements Power {
     @Override
     public ItemStack getTool() {
         return Stone.generateStoneTool(Material.GOLDEN_SHOVEL, 4, "Dash");
+    }
+
+    @Override
+    public Set<ItemStack> getItems() {
+        return new HashSet<>(Collections.singletonList(getTool()));
     }
 }

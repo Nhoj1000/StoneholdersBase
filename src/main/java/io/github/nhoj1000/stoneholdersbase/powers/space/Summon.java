@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.Random;
+import java.util.*;
 
 public class Summon implements Power {
     private int numZombies, spawnRange;
@@ -46,6 +46,11 @@ public class Summon implements Power {
     @Override
     public ItemStack getTool() {
         return Stone.generateStoneTool(Material.STONE_SHOVEL, 4, "Summon");
+    }
+
+    @Override
+    public Set<ItemStack> getItems() {
+        return new HashSet<>(Collections.singletonList(getTool()));
     }
 
     public static String getZombieName() {

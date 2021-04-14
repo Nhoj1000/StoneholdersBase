@@ -1,10 +1,7 @@
 package io.github.nhoj1000.stoneholdersbase;
 
 import io.github.nhoj1000.stoneholdersbase.commands.StoneSetCommand;
-import io.github.nhoj1000.stoneholdersbase.events.BowShootEvent;
-import io.github.nhoj1000.stoneholdersbase.events.PlayerActivatePower;
-import io.github.nhoj1000.stoneholdersbase.events.EntityDamagedByEntity;
-import io.github.nhoj1000.stoneholdersbase.events.PlayerDeath;
+import io.github.nhoj1000.stoneholdersbase.events.*;
 import io.github.nhoj1000.stoneholdersbase.powers.power.*;
 import io.github.nhoj1000.stoneholdersbase.powers.reality.*;
 import io.github.nhoj1000.stoneholdersbase.powers.soul.*;
@@ -28,7 +25,6 @@ public final class StoneholdersBase extends JavaPlugin {
 
     private static StoneholdersBase plugin;
 
-
     @Override
     public void onEnable() {
         plugin = this;
@@ -38,12 +34,14 @@ public final class StoneholdersBase extends JavaPlugin {
         pm.registerEvents(new EntityDamagedByEntity(), this);
         pm.registerEvents(new PlayerDeath(), this);
         pm.registerEvents(new BowShootEvent(), this);
+        pm.registerEvents(new EntityMovingEvent(), this);
 
         getCommand("stone").setExecutor(new StoneSetCommand());
 
         stoneSetup();
     }
 
+    //region Stone helper methods
     private void stoneSetup() {
         Stone powerStone = new Stone(ChatColor.DARK_PURPLE + "Power stone");
         powerStone.registerPowers(new PowerFireball(3), new Powerup(), new PowerShield(10, 1.5));
@@ -80,11 +78,29 @@ public final class StoneholdersBase extends JavaPlugin {
     public static Map<String, Stone> getStones() {
         return stones;
     }
+    //endregion
 
-    public static Map<UUID, Stoneholder> getStoneholderMap() {
-        return stoneholderMap;
+    //region Stoneholder map methods
+    public static Stoneholder getStoneholder(Player p) {
+        return stoneholderMap.get(p.getUniqueId());
     }
 
+    public static Stoneholder setStoneholder(Player p, boolean b) {
+        Stoneholder temp = null;
+        if(b) {
+            temp = new Stoneholder(p);
+            stoneholderMap.put(p.getUniqueId(), temp);
+        } else
+            stoneholderMap.remove(p.getUniqueId());
+        return temp;
+    }
+
+    public static boolean isStoneholder(Player p) {
+        return stoneholderMap.containsKey(p.getUniqueId());
+    }
+    //endregion
+
+    //region Misc helper methods
     public static ItemStack getPlayerHead(Player player) {
         ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) skull.getItemMeta();
@@ -97,4 +113,5 @@ public final class StoneholdersBase extends JavaPlugin {
     public static StoneholdersBase getInstance() {
         return plugin;
     }
+    //endregion
 }
