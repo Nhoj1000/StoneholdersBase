@@ -1,6 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.powers.space;
 
-import io.github.nhoj1000.stoneholdersbase.Power;
+import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import io.github.nhoj1000.stoneholdersbase.Stone;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,17 +12,12 @@ import org.bukkit.inventory.ItemStack;
 import java.util.*;
 
 public class Scatter implements Power {
-    private  int grabRange, scatterRange;
-    private Random random = new Random();
+    private final int grabRange, scatterRange;
+    private final Random random = new Random();
 
     public Scatter(int grabRange, int scatterRange) {
         this.grabRange = grabRange;
         this.scatterRange = scatterRange;
-    }
-
-    @Override
-    public boolean isSpecial() {
-        return false;
     }
 
     @Override
@@ -46,7 +41,7 @@ public class Scatter implements Power {
 
     @Override
     public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.DIAMOND_SHOVEL, 4, "Scatter");
+        return Stone.generateStoneTool(Material.DIAMOND_SHOVEL, 4, "Scatter", Collections.singletonList(""));
     }
 
     private int limit(int i, int min, int max) {
@@ -54,7 +49,7 @@ public class Scatter implements Power {
     }
 
     @Override
-    public Set<ItemStack> getItems() {
-        return new HashSet<>(Collections.singletonList(getTool()));
+    public int getManaCost() {
+        return 75;
     }
 }

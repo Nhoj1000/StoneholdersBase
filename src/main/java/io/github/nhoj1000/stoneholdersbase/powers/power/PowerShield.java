@@ -1,29 +1,23 @@
 package io.github.nhoj1000.stoneholdersbase.powers.power;
 
 
-import io.github.nhoj1000.stoneholdersbase.Power;
 import io.github.nhoj1000.stoneholdersbase.Stone;
+import io.github.nhoj1000.stoneholdersbase.powers.UniquePower;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
 import java.util.*;
 
-public class PowerShield implements Power {
+public class PowerShield implements UniquePower {
     private final int radius;
     private final double powerMultiplier;
 
     public PowerShield(int radius, double powerMultiplier) {
         this.radius = radius;
         this.powerMultiplier = powerMultiplier;
-    }
-
-    @Override
-    public boolean isSpecial() {
-        return true;
     }
 
     @Override
@@ -37,12 +31,21 @@ public class PowerShield implements Power {
     }
 
     @Override
-    public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.SHIELD, 1, "Power Shield");
+    public Set<ItemStack> getItems() {
+        return new HashSet<>(Collections.singletonList(getPowerShield()));
     }
 
     @Override
-    public Set<ItemStack> getItems() {
-        return new HashSet<>(Collections.singletonList(getTool()));
+    public int getManaCost() {
+        return 50;
+    }
+
+    @Override
+    public ItemStack getActivationItem() {
+        return getPowerShield();
+    }
+
+    public static ItemStack getPowerShield() {
+        return Stone.generateStoneTool(Material.SHIELD, 1, "Power Shield", Collections.singletonList(""));
     }
 }

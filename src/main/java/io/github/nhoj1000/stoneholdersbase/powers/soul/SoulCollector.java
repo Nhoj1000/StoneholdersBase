@@ -1,6 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.powers.soul;
 
-import io.github.nhoj1000.stoneholdersbase.PassivePower;
+import io.github.nhoj1000.stoneholdersbase.powers.PassivePower;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;

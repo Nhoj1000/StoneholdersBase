@@ -1,29 +1,26 @@
 package io.github.nhoj1000.stoneholdersbase.powers.reality;
 
-import io.github.nhoj1000.stoneholdersbase.PassivePower;
-import io.github.nhoj1000.stoneholdersbase.Power;
-import io.github.nhoj1000.stoneholdersbase.Stone;
-import io.github.nhoj1000.stoneholdersbase.StoneholdersBase;
+import io.github.nhoj1000.stoneholdersbase.*;
+import io.github.nhoj1000.stoneholdersbase.powers.UniquePower;
 import org.bukkit.*;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
-public class GlassBow implements Power, PassivePower {
-    private static HashMap<UUID, Tagged> targetMap = new HashMap<>();
+public class GlassBow implements UniquePower {
+    private static final HashMap<UUID, Tagged> targetMap = new HashMap<>();
     private static int decayDelay;
 
     public GlassBow(int decayDelay) {
         GlassBow.decayDelay = decayDelay;
-    }
-
-    @Override
-    public boolean isSpecial() {
-        return true;
     }
 
     @Override
@@ -41,11 +38,6 @@ public class GlassBow implements Power, PassivePower {
             return 1;
         }
         return -1;
-    }
-
-    @Override
-    public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.BOW, 2, "Glass Bow");
     }
 
     public static void setTarget(Player shooter, Entity target, boolean verbose) {
@@ -93,16 +85,6 @@ public class GlassBow implements Power, PassivePower {
 
     }
 
-    @Override
-    public void activatePower(Player p) {
-        targetMap.put(p.getUniqueId(), null);
-    }
-
-    @Override
-    public void deactivatePower(Player p) {
-        targetMap.remove(p.getUniqueId());
-    }
-
     private static class Tagged {
         public BukkitTask task;
         public Entity entity;
@@ -110,6 +92,36 @@ public class GlassBow implements Power, PassivePower {
 
     @Override
     public Set<ItemStack> getItems() {
-        return new HashSet<>(Arrays.asList(getTool(), new ItemStack(Material.ARROW, 10)));
+        Set<ItemStack> items = new HashSet<>();
+        items.add(getActivationItem());
+        ItemStack glassArrows = getGlassArrow();
+        glassArrows.setAmount(5);
+        items.add(glassArrows);
+        return items;
+    }
+
+    @Override
+    public int getManaCost() {
+        return 30;
+    }
+
+    @Override
+    public ItemStack getActivationItem() {
+        return getGlassBow();
+    }
+
+    public static ItemStack getGlassBow() {
+        return Stone.generateStoneTool(Material.BOW, 2, "Glass Bow", Collections.singletonList(""));
+    }
+
+    public static ItemStack getGlassArrow() {
+        ItemStack glassArrow = new ItemStack(Material.TIPPED_ARROW);
+        PotionMeta glassMeta = (PotionMeta) glassArrow.getItemMeta();
+        glassMeta.addCustomEffect(new PotionEffect(PotionEffectType.UNLUCK, 1, 0, false, false), true);
+        glassMeta.setDisplayName("Glass Arrow");
+        glassMeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+        glassArrow.setItemMeta(glassMeta);
+
+        return glassArrow;
     }
 }

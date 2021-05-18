@@ -9,3 +9,6 @@ commands:
   stone:
     description: Sets user's stone
     usage: /<command> [add/remove/clear] [user] [stone]
+  noMana:
+    description: Sets if user is required to have mana
+    usage: /<command> [user]

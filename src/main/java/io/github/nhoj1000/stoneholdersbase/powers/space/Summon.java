@@ -1,6 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.powers.space;
 
-import io.github.nhoj1000.stoneholdersbase.Power;
+import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import io.github.nhoj1000.stoneholdersbase.Stone;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -13,16 +13,11 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.*;
 
 public class Summon implements Power {
-    private int numZombies, spawnRange;
+    private final int numZombies, spawnRange;
 
     public Summon(int numZombies, int spawnRange) {
         this.numZombies = numZombies;
         this.spawnRange = spawnRange;
-    }
-
-    @Override
-    public boolean isSpecial() {
-        return false;
     }
 
     @Override
@@ -45,12 +40,12 @@ public class Summon implements Power {
 
     @Override
     public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.STONE_SHOVEL, 4, "Summon");
+        return Stone.generateStoneTool(Material.STONE_SHOVEL, 4, "Summon", Collections.singletonList(""));
     }
 
     @Override
-    public Set<ItemStack> getItems() {
-        return new HashSet<>(Collections.singletonList(getTool()));
+    public int getManaCost() {
+        return 65;
     }
 
     public static String getZombieName() {

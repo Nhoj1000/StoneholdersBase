@@ -1,83 +1,125 @@
 package io.github.nhoj1000.stoneholdersbase;
 
+import io.github.nhoj1000.stoneholdersbase.powers.PassivePower;
+import io.github.nhoj1000.stoneholdersbase.powers.Power;
+import io.github.nhoj1000.stoneholdersbase.powers.UniquePower;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 
 public class Stoneholder {
     private final Player player;
-    private final Set<Stone> stones = new HashSet<>();
-    private final List<Integer> cooldowns = new ArrayList<>();    //TODO add cooldowns
+    private final Map<Stone, Power> stones = new HashMap<>();  //currently held stones
+    private static double MANA_REGEN = 1;    //passive mana regen per second
+    private double mana, maxMana;   //current mana and max mana, respectively
+    BossBar manaBar;
+
+    private boolean manaRequired = true;  //true if mana is required, false if not
 
     public Stoneholder(Player player) {
         this.player = player;
+        manaBar = Bukkit.createBossBar("Mana", BarColor.PURPLE, BarStyle.SOLID);
+        manaBar.addPlayer(player);
+        mana = 100;
     }
 
     public Player getPlayer() {
         return player;
     }
 
-    /**
-     *  Small check to see if the user has access to a certain power associated with a tool
-     * @param i Tool to check
-     * @param special false if you want a normal active power, true otherwise (shield, glass bow, etc.)
-     * @return  null if user doesn't have power, returns the power otherwise
-     */
-    private Power checkTool(ItemStack i, boolean special) {
-        for(Stone s: stones) {
-            Power temp = s.getPowerMap().get(i);
-            if(temp != null && temp.isSpecial() == special)
-                return temp;
-        }
-        return null;
-    }
-
-    public boolean useNormalPower(ItemStack i) {
-        Power p = checkTool(i, false);
-        if(p != null) {
-            int cooldown = p.usePower(player);
-            return true;
-        }
-        return false;
-    }
-
-    public void useSpecialPower(ItemStack i) {
-        Power p = checkTool(i, true);
-        if(p != null) {
-            int cooldown = p.usePower(player);
+    public void useNormalPower(Stone s) {
+        Power p = stones.get(s);
+        if(p != null && mana >= p.getManaCost()) {
+            p.usePower(player);
+            mana -= p.getManaCost();
+            updateMana();
         }
     }
 
-    public void addStone(Stone stone) {
-        if(!stones.contains(stone)) {
-            stones.add(stone);
+    public void useUniquePower(ItemStack i) {
+        UniquePower p = null;
+        for(Stone s: stones.keySet())
+            if(s.getUniquePowerMap().containsKey(i)) {
+                p = s.getUniquePowerMap().get(i);
+                break;
+            }
+        if(p != null && mana >= p.getManaCost()) {
+            p.usePower(player);
+            mana -= p.getManaCost();
+            updateMana();
+        }
+    }
+
+    public void selectPowerGUI(Stone s) {
+        Inventory powerGUI = Bukkit.createInventory(null, 9, ChatColor.DARK_GRAY + "Power Selection");
+
+        ItemStack exit = new ItemStack(Material.BARRIER);
+        ItemMeta exitMeta = exit.getItemMeta();
+        exitMeta.setDisplayName(ChatColor.RED + "Exit");
+        exit.setItemMeta(exitMeta);
+
+        ItemStack[] menuItems = new ItemStack[9];
+        int i = 0;
+        for(Power p: s.getPowerSet())
+            menuItems[i++] = p.getTool();
+        menuItems[8] = exit;
+
+        powerGUI.setContents(menuItems);
+        player.openInventory(powerGUI);
+    }
+
+    public void setStonePower(Power p) {
+        for(Stone s: stones.keySet())
+            if(s.getPowerSet().contains(p)) {
+                stones.put(s, p);
+                break;
+            }
+    }
+
+    public boolean addStone(Stone stone) {
+        if(!stones.containsKey(stone)) {
+            stones.put(stone, null);
             actionBarMessage("Acquired " + stone);
-            for (ItemStack i : stone.getPowerMap().keySet())  //TODO ensure no copies of items
-                player.getInventory().addItem(i);
+            for (ItemStack i : stone.getPlayerItems())
+                if(!player.getInventory().contains(i)) player.getInventory().addItem(i);
             for (PassivePower p : stone.getPassivePowerSet())
                 p.activatePower(player);
-        }
+        } else
+            return false;
+        updateMaxMana();
+        return true;
     }
 
-    public void removeStone(Stone stone) {
-        if(stones.contains(stone)) {
+    public boolean removeStone(Stone stone) {
+        if(stones.containsKey(stone)) {
             stones.remove(stone);
             actionBarMessage("Lost " + stone);
-            for (ItemStack i : stone.getPowerMap().keySet())
+            for (ItemStack i : stone.getPlayerItems())
                 player.getInventory().removeItem(i);
             for (PassivePower p : stone.getPassivePowerSet())
                 p.deactivatePower(player);
-        }
+        } else
+            return false;
+        updateMaxMana();
+        return true;
     }
 
     public void clearStones() {
-        Iterator<Stone> iterator = stones.iterator();
+        Iterator<Stone> iterator = stones.keySet().iterator();
         while (iterator.hasNext()) {
             Stone stone = iterator.next();
-            for (ItemStack i : stone.getPowerMap().keySet())
+            for (ItemStack i : stone.getPlayerItems())
                 player.getInventory().removeItem(i);
             for (PassivePower p : stone.getPassivePowerSet())
                 p.deactivatePower(player);
@@ -86,7 +128,7 @@ public class Stoneholder {
     }
 
     public Set<Stone> getStones() {
-        return stones;
+        return stones.keySet();
     }
 
     public void actionBarMessage(String message) {
@@ -96,4 +138,37 @@ public class Stoneholder {
     public boolean isStoneholder() {
         return stones.size() > 0;
     }
+
+    //region Mana stuff
+    public void regen() {
+        mana = Math.min(maxMana, mana + MANA_REGEN);
+        updateMana();
+    }
+
+    public void updateMana() {
+        if(!manaRequired) mana = maxMana;
+        manaBar.setProgress(Math.max(0, mana)/maxMana);
+    }
+
+    private void updateMaxMana() {
+        maxMana = 100 + 10 * stones.size();
+        if(isStoneholder())
+            manaBar.addPlayer(player);
+        else
+            manaBar.removePlayer(player);
+    }
+
+    public void boostManaRegen(double multiplier, int seconds) {
+        double oldManaRegen = MANA_REGEN;
+        MANA_REGEN *= multiplier;
+        Bukkit.getScheduler().runTaskLater(StoneholdersBase.getInstance(), () -> MANA_REGEN = oldManaRegen, seconds * 20L);
+    }
+
+    //Toggles the need for mana
+    public boolean toggleManaRequired() {
+        manaRequired = !manaRequired;
+        updateMana();
+        return manaRequired;
+    }
+    //endregion
 }

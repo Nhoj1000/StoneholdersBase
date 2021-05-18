@@ -1,6 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.powers.power;
 
-import io.github.nhoj1000.stoneholdersbase.Power;
+import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import io.github.nhoj1000.stoneholdersbase.Stone;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -9,10 +9,8 @@ import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+
 
 public class PowerFireball implements Power {
     private static int yield;
@@ -21,10 +19,6 @@ public class PowerFireball implements Power {
         PowerFireball.yield = yield;
     }
 
-    @Override
-    public boolean isSpecial() {
-        return false;
-    }
 
     @Override
     public int usePower(Player player) {
@@ -37,11 +31,11 @@ public class PowerFireball implements Power {
 
     @Override
     public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.DIAMOND_SHOVEL, 1, "Fireball");
+        return Stone.generateStoneTool(Material.DIAMOND_SHOVEL, 1, "Fireball", Collections.singletonList(""));
     }
 
     @Override
-    public Set<ItemStack> getItems() {
-        return new HashSet<>(Collections.singletonList(getTool()));
+    public int getManaCost() {
+        return 30;
     }
 }

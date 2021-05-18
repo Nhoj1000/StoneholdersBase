@@ -1,6 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.powers.time;
 
-import io.github.nhoj1000.stoneholdersbase.Power;
+import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import io.github.nhoj1000.stoneholdersbase.Stone;
 import io.github.nhoj1000.stoneholdersbase.StoneholdersBase;
 import org.bukkit.Bukkit;
@@ -23,11 +23,6 @@ public class Pause implements Power {
     public Pause(int radius, int time) {
         this.radius = radius;
         this.time = time;
-    }
-
-    @Override
-    public boolean isSpecial() {
-        return false;
     }
 
     @Override
@@ -65,12 +60,12 @@ public class Pause implements Power {
 
     @Override
     public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.GOLDEN_SHOVEL, 5, "Pause");
+        return Stone.generateStoneTool(Material.GOLDEN_SHOVEL, 5, "Pause", Collections.singletonList(""));
     }
 
     @Override
-    public Set<ItemStack> getItems() {
-        return new HashSet<>(Collections.singletonList(getTool()));
+    public int getManaCost() {
+        return 65;
     }
 
     public static void setFrozen(Entity e, boolean frozen) {

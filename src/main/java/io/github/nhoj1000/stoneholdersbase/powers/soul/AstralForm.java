@@ -1,6 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.powers.soul;
 
-import io.github.nhoj1000.stoneholdersbase.Power;
+import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import io.github.nhoj1000.stoneholdersbase.Stone;
 import io.github.nhoj1000.stoneholdersbase.StoneholdersBase;
 import org.bukkit.*;
@@ -11,21 +11,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+
 
 public class AstralForm implements Power {
     private static int astralTime;
 
     public AstralForm(int astralTime) {
         AstralForm.astralTime = astralTime;
-    }
-
-    @Override
-    public boolean isSpecial() {
-        return false;
     }
 
     @Override
@@ -62,11 +55,11 @@ public class AstralForm implements Power {
 
     @Override
     public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.GOLDEN_SHOVEL, 3, "Astral Form");
+        return Stone.generateStoneTool(Material.GOLDEN_SHOVEL, 3, "Astral Form", Collections.singletonList(""));
     }
 
     @Override
-    public Set<ItemStack> getItems() {
-        return new HashSet<>(Collections.singletonList(getTool()));
+    public int getManaCost() {
+        return 60;
     }
 }

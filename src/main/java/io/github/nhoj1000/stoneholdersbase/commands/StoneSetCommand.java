@@ -22,17 +22,17 @@ public class StoneSetCommand implements TabExecutor {
         Player target;
 
         if(args.length > 1) {   //Ensures 2 args entered
-            if ((target = Bukkit.getPlayer(args[1])) == null) //Finds target player
+            target = Bukkit.getPlayer(args[1]);
+            if (target == null) //Finds target player
                 return informAndReturn(sender, ChatColor.RED + "Target not found!", true);
             Stoneholder s = StoneholdersBase.getStoneholder(target);
 
             if (args.length == 2) { //clear and list commands
-                if (s == null)
+                if (!s.isStoneholder())
                     return informAndReturn(sender,ChatColor.RED + "Target is not a stoneholder!", true);
 
                 if (args[0].equals("clear")) {
                     s.clearStones();
-                    StoneholdersBase.setStoneholder(target, false);
                     return informAndReturn(sender, "Target's stones have been cleared.", true);
                 } else if (args[0].equals("list")) {
                     StringBuilder key = new StringBuilder(target.getName() + "'s stones:\n");
@@ -41,25 +41,19 @@ public class StoneSetCommand implements TabExecutor {
                     return informAndReturn(sender, key.toString(), true);
                 }
             } else if (args.length == 3) {  //add and remove commands
-                Stone stone = StoneholdersBase.getStone(args[2]);
+                Stone stone = StoneholdersBase.getStoneFromName(args[2]);
                 if (stone == null)
                     return informAndReturn(sender, ChatColor.RED + "Stone not found!", true);
 
                 if (args[0].equals("add")) {
-                    if (s == null) {
-                        s = StoneholdersBase.setStoneholder(target, true);
-                        sender.sendMessage(target.getName() + " is now a stoneholder.");
-                    }
-                    s.addStone(stone);
+                    if (!s.isStoneholder()) sender.sendMessage(target.getName() + " is now a stoneholder.");
+                    if (s.addStone(stone)) sender.sendMessage(target.getName() + " has acquired the " + stone);
+                    else sender.sendMessage(target.getName() + " already has the " + stone);
                     return true;
                 } else if (args[0].equals("remove")) {
-                    if (s == null)
-                        return informAndReturn(sender, ChatColor.RED + "Target is not a stoneholder!", true);
-                    s.removeStone(stone);
-                    if (!s.isStoneholder()) {
-                        StoneholdersBase.setStoneholder(target, false);
-                        return informAndReturn(sender, target.getName() + " is no longer a stoneholder.", true);
-                    }
+                    if(s.removeStone(stone)) sender.sendMessage(target.getName() + " no longer has the " + stone);
+                    else sender.sendMessage(target.getName() + " does not have the " + stone);
+                    if (!s.isStoneholder()) sender.sendMessage(target.getName() + " is no longer a stoneholder.");
                     return true;
                 }
             }
@@ -73,7 +67,7 @@ public class StoneSetCommand implements TabExecutor {
             case 1:
                 return trimList(Arrays.asList("add", "remove", "clear", "list"), args[0]);
             case 3:
-                return trimList(new ArrayList<>(StoneholdersBase.getStones().keySet()), args[2]);
+                return trimList(new ArrayList<>(StoneholdersBase.getStoneNameMap().keySet()), args[2]);
             default:
                 return null;
         }

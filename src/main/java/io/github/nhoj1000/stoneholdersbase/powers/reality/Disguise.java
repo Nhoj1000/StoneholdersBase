@@ -1,6 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.powers.reality;
 
-import io.github.nhoj1000.stoneholdersbase.Power;
+import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import io.github.nhoj1000.stoneholdersbase.Stone;
 import io.github.nhoj1000.stoneholdersbase.StoneholdersBase;
 import org.bukkit.Bukkit;
@@ -22,11 +22,6 @@ public class Disguise implements Power {
     public Disguise(int range, int maxTime) {
         Disguise.range = range;
         Disguise.maxTime = maxTime;
-    }
-
-    @Override
-    public boolean isSpecial() {
-        return false;
     }
 
     @Override
@@ -68,7 +63,7 @@ public class Disguise implements Power {
 
     @Override
     public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.GOLDEN_SHOVEL, 2, "Disguise");
+        return Stone.generateStoneTool(Material.GOLDEN_SHOVEL, 2, "Disguise", Collections.singletonList(""));
     }
 
     private class DisguisedUser{
@@ -78,7 +73,7 @@ public class Disguise implements Power {
     }
 
     @Override
-    public Set<ItemStack> getItems() {
-        return new HashSet<>(Collections.singletonList(getTool()));
+    public int getManaCost() {
+        return 35;
     }
 }

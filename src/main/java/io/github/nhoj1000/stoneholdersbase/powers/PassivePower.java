@@ -1,4 +1,4 @@
-package io.github.nhoj1000.stoneholdersbase;
+package io.github.nhoj1000.stoneholdersbase.powers;
 
 import org.bukkit.entity.Player;
 

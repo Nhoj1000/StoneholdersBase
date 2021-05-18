@@ -1,6 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.powers.time;
 
-import io.github.nhoj1000.stoneholdersbase.Power;
+import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import io.github.nhoj1000.stoneholdersbase.Stone;
 import io.github.nhoj1000.stoneholdersbase.StoneholdersBase;
 import org.bukkit.*;
@@ -20,11 +20,6 @@ public class Checkpoint implements Power {
     public Checkpoint(int recallTime) {
         plugin = StoneholdersBase.getInstance();
         this.recallTime = recallTime;
-    }
-
-    @Override
-    public boolean isSpecial() {
-        return false;
     }
 
     @Override
@@ -58,12 +53,12 @@ public class Checkpoint implements Power {
 
     @Override
     public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.DIAMOND_SHOVEL, 5, "Checkpoint");
+        return Stone.generateStoneTool(Material.DIAMOND_SHOVEL, 5, "Checkpoint", Collections.singletonList(""));
     }
 
     @Override
-    public Set<ItemStack> getItems() {
-        return new HashSet<>(Collections.singletonList(getTool()));
+    public int getManaCost() {
+        return 55;
     }
 
     public static boolean isImmortal(Player p) {

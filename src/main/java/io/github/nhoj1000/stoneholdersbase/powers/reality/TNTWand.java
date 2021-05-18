@@ -1,6 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.powers.reality;
 
-import io.github.nhoj1000.stoneholdersbase.Power;
+import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import io.github.nhoj1000.stoneholdersbase.Stone;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -11,10 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+
 
 public class TNTWand implements Power {
     private static int range, yield;
@@ -22,11 +20,6 @@ public class TNTWand implements Power {
     public TNTWand(int range, int yield) {
         TNTWand.range = range; //30
         TNTWand.yield = yield; //15
-    }
-
-    @Override
-    public boolean isSpecial() {
-        return false;
     }
 
     @Override
@@ -47,11 +40,11 @@ public class TNTWand implements Power {
 
     @Override
     public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.DIAMOND_SHOVEL, 2, "TNT Wand");
+        return Stone.generateStoneTool(Material.DIAMOND_SHOVEL, 2, "TNT Wand", Collections.singletonList(""));
     }
 
     @Override
-    public Set<ItemStack> getItems() {
-        return new HashSet<>(Collections.singletonList(getTool()));
+    public int getManaCost() {
+        return 55;
     }
 }

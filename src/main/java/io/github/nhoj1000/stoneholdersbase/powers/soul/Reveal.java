@@ -1,6 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.powers.soul;
 
-import io.github.nhoj1000.stoneholdersbase.Power;
+import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import io.github.nhoj1000.stoneholdersbase.Stone;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -21,11 +21,6 @@ public class Reveal implements Power {
     }
 
     @Override
-    public boolean isSpecial() {
-        return false;
-    }
-
-    @Override
     public int usePower(Player player) {
         List<Entity> nearby = player.getNearbyEntities(radius, radius, radius);
         for (Entity ent : nearby)
@@ -40,11 +35,11 @@ public class Reveal implements Power {
 
     @Override
     public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.DIAMOND_SHOVEL, 3, "Reveal");
+        return Stone.generateStoneTool(Material.DIAMOND_SHOVEL, 3, "Reveal", Collections.singletonList(""));
     }
 
     @Override
-    public Set<ItemStack> getItems() {
-        return new HashSet<>(Collections.singletonList(getTool()));
+    public int getManaCost() {
+        return 30;
     }
 }

@@ -1,6 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.powers.power;
 
-import io.github.nhoj1000.stoneholdersbase.Power;
+import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import io.github.nhoj1000.stoneholdersbase.Stone;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -9,17 +9,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+
 
 public class Powerup implements Power {
-    @Override
-    public boolean isSpecial() {
-        return false;
-    }
-
     @Override
     public int usePower(Player player) {
         player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 160, 2));
@@ -32,11 +25,11 @@ public class Powerup implements Power {
 
     @Override
     public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.GOLDEN_SHOVEL, 1, "Powerup");
+        return Stone.generateStoneTool(Material.GOLDEN_SHOVEL, 1, "Powerup", Collections.singletonList(""));
     }
 
     @Override
-    public Set<ItemStack> getItems() {
-        return new HashSet<>(Collections.singletonList(getTool()));
+    public int getManaCost() {
+        return 40;
     }
 }

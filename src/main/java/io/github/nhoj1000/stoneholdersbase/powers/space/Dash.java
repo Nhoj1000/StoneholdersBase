@@ -1,6 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.powers.space;
 
-import io.github.nhoj1000.stoneholdersbase.Power;
+import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import io.github.nhoj1000.stoneholdersbase.Stone;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -14,15 +14,10 @@ import org.bukkit.util.Vector;
 import java.util.*;
 
 public class Dash implements Power {
-    private int dashDistance;
+    private final int dashDistance;
 
     public Dash(int dashDistance) {
         this.dashDistance = dashDistance;
-    }
-
-    @Override
-    public boolean isSpecial() {
-        return false;
     }
 
     @Override
@@ -51,11 +46,11 @@ public class Dash implements Power {
 
     @Override
     public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.GOLDEN_SHOVEL, 4, "Dash");
+        return Stone.generateStoneTool(Material.GOLDEN_SHOVEL, 4, "Dash", Collections.singletonList(""));
     }
 
     @Override
-    public Set<ItemStack> getItems() {
-        return new HashSet<>(Collections.singletonList(getTool()));
+    public int getManaCost() {
+        return 35;
     }
 }

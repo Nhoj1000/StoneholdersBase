@@ -31,13 +31,14 @@ public class EntityDamagedByEntity implements Listener{
 
         if(e.getEntity() instanceof Player) {
             Player p = (Player) e.getEntity();
+            if(!StoneholdersBase.isStoneholder(p)) return;
+
             Stoneholder s = StoneholdersBase.getStoneholder(p);
-            if(s != null)
-                if(p.isBlocking() && p.isSneaking())
-                    if(p.getInventory().getItemInMainHand().getType() == Material.SHIELD)
-                        s.useSpecialPower(p.getInventory().getItemInMainHand());
-                    else
-                        s.useSpecialPower(p.getInventory().getItemInOffHand());
+            if(p.isBlocking() && p.isSneaking())
+                if(p.getInventory().getItemInMainHand().getType() == Material.SHIELD)
+                    s.useUniquePower(p.getInventory().getItemInMainHand());
+                else
+                    s.useUniquePower(p.getInventory().getItemInOffHand());
         }
     }
 }
