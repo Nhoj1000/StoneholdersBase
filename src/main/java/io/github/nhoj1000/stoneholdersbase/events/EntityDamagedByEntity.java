@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.inventory.meta.PotionMeta;
 
 public class EntityDamagedByEntity implements Listener{
     @EventHandler
@@ -18,15 +19,21 @@ public class EntityDamagedByEntity implements Listener{
         if(Pause.isFrozen(e.getEntity()))
             e.setCancelled(true);
 
-        if(e.getDamager() instanceof Arrow && e.getEntity() instanceof LivingEntity &&
-                ((Arrow) e.getDamager()).getShooter() instanceof Player) {
-            Player shooter = (Player) ((Arrow) e.getDamager()).getShooter();
-            Stoneholder p = StoneholdersBase.getStoneholder(shooter);
-            if (p != null)
-                if (((LivingEntity) e.getEntity()).getHealth() - e.getDamage() > 0)
-                    GlassBow.setTarget(shooter, e.getEntity(), true);
-                else
-                    GlassBow.clearTarget(shooter, false);
+
+        if(e.getDamager() instanceof Arrow) {
+            Arrow arrow = (Arrow) e.getDamager();
+            if (arrow.getCustomEffects().equals(((PotionMeta) GlassBow.getGlassArrow().getItemMeta()).getCustomEffects())) {
+                Player shooter = (Player) arrow.getShooter();
+                Stoneholder sh = StoneholdersBase.getStoneholder(shooter);
+                if (sh.getStones().contains(StoneholdersBase.getStoneFromName("reality")))
+                    if(e.getEntity() instanceof LivingEntity) {
+                        if (((LivingEntity) e.getEntity()).getHealth() - e.getDamage() > 0)
+                            GlassBow.setTarget(shooter, e.getEntity(), true);
+                        else
+                            GlassBow.clearTarget(shooter, false);
+                    } else
+                        GlassBow.setTarget(shooter, e.getEntity(), true);
+            }
         }
 
         if(e.getEntity() instanceof Player) {

@@ -34,7 +34,7 @@ public class Stone {
 
     //returns physical item representing the stone
     public ItemStack getStoneItem() {
-        return Stone.generateStoneTool(Material.DIAMOND_HOE, damageID, stoneName, Collections.singletonList(""));
+        return Stone.generateStoneTool(Material.WOODEN_SWORD, damageID, stoneName, Collections.singletonList(""));
     }
 
     public void registerPowers(Power... powers) {

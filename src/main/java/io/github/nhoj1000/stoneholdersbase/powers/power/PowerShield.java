@@ -21,13 +21,12 @@ public class PowerShield implements UniquePower {
     }
 
     @Override
-    public int usePower(Player player) {
+    public boolean usePower(Player player) {
         List<Entity> entities = player.getNearbyEntities(radius, radius, radius);
         for (Entity e : entities)
             e.setVelocity(e.getLocation().subtract(player.getEyeLocation()).toVector().normalize().multiply(powerMultiplier));
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST_FAR, 100, 1);
-
-        return 1;
+        return true;
     }
 
     @Override

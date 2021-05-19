@@ -21,7 +21,7 @@ public class Scatter implements Power {
     }
 
     @Override
-    public int usePower(Player player) {
+    public boolean usePower(Player player) {
         World world = player.getWorld();
         Location center = world.getWorldBorder().getCenter();
         int size = (int) world.getWorldBorder().getSize();
@@ -35,8 +35,7 @@ public class Scatter implements Power {
                     center.getBlockZ() - size/2, center.getBlockZ() + size/2);
             entity.teleport(new Location(world, randX, world.getHighestBlockYAt(randX, randZ) + 1, randZ));
         }
-
-        return 1;
+        return true;
     }
 
     @Override

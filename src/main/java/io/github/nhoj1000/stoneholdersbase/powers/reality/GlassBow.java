@@ -24,7 +24,7 @@ public class GlassBow implements UniquePower {
     }
 
     @Override
-    public int usePower(Player player) {
+    public boolean usePower(Player player) {
         Tagged temp = targetMap.get(player.getUniqueId());
         if(temp != null) {
             Entity targetEntity = temp.entity;
@@ -35,31 +35,29 @@ public class GlassBow implements UniquePower {
 
             if(targetEntity instanceof Arrow)
                 targetEntity.remove();
-            return 1;
+            return true;
         }
-        return -1;
+        return false;
     }
 
     public static void setTarget(Player shooter, Entity target, boolean verbose) {
-        if(targetMap.containsKey(shooter.getUniqueId())) {
-            Tagged temp = targetMap.get(shooter.getUniqueId());
-            if(temp == null)
-                temp = new Tagged();
+        if(!targetMap.containsKey(shooter.getUniqueId()))
+            targetMap.put(shooter.getUniqueId(), null);
+        Tagged temp = targetMap.get(shooter.getUniqueId());
+        if(temp == null)
+            temp = new Tagged();
+        else
+            temp.task.cancel();
+        temp.entity = target;
+        temp.task = Bukkit.getScheduler().runTaskLater(StoneholdersBase.getInstance(),
+                () -> clearTarget(shooter, true), 20L * decayDelay);
+        targetMap.put(shooter.getUniqueId(), temp);
+
+        if(verbose)
+            if (target instanceof Player)
+                shooter.sendMessage(ChatColor.DARK_RED + "Tagged " + target.getName());
             else
-                temp.task.cancel();
-            temp.entity = target;
-            temp.task = Bukkit.getScheduler().runTaskLater(StoneholdersBase.getInstance(),
-                    () -> clearTarget(shooter, true), 20L * decayDelay);
-            targetMap.put(shooter.getUniqueId(), temp);
-
-            if(verbose)
-                if (target instanceof Player)
-                    shooter.sendMessage(ChatColor.DARK_RED + "Tagged " + target.getName());
-                else
-                    shooter.sendMessage(ChatColor.DARK_RED + "Tagged a " + target.getType());
-        }
-
-
+                shooter.sendMessage(ChatColor.DARK_RED + "Tagged a " + target.getType());
     }
 
     public static void clearTarget(Player shooter, boolean verbose) {
@@ -95,7 +93,6 @@ public class GlassBow implements UniquePower {
         Set<ItemStack> items = new HashSet<>();
         items.add(getActivationItem());
         ItemStack glassArrows = getGlassArrow();
-        glassArrows.setAmount(5);
         items.add(glassArrows);
         return items;
     }

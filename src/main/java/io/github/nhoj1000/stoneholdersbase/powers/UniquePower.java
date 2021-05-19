@@ -6,7 +6,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Set;
 
 public interface UniquePower {
-    int usePower(Player player);
+    boolean usePower(Player player);
     int getManaCost();
     ItemStack getActivationItem();
     Set<ItemStack> getItems();

@@ -23,15 +23,15 @@ public class Stoneholder {
     private final Map<Stone, Power> stones = new HashMap<>();  //currently held stones
     private static double MANA_REGEN = 1;    //passive mana regen per second
     private double mana, maxMana;   //current mana and max mana, respectively
-    BossBar manaBar;
+    BossBar manaBar = Bukkit.createBossBar("Mana", BarColor.PURPLE, BarStyle.SEGMENTED_10);
+    BossBar previewBar = Bukkit.createBossBar("", BarColor.GREEN, BarStyle.SEGMENTED_10);
 
     private boolean manaRequired = true;  //true if mana is required, false if not
 
     public Stoneholder(Player player) {
         this.player = player;
-        manaBar = Bukkit.createBossBar("Mana", BarColor.PURPLE, BarStyle.SOLID);
-        manaBar.addPlayer(player);
-        mana = 100;
+        mana = 50;
+        updateMaxMana();
     }
 
     public Player getPlayer() {
@@ -41,9 +41,11 @@ public class Stoneholder {
     public void useNormalPower(Stone s) {
         Power p = stones.get(s);
         if(p != null && mana >= p.getManaCost()) {
-            p.usePower(player);
-            mana -= p.getManaCost();
-            updateMana();
+            player.setCooldown(s.getStoneItem().getType(), 10);
+            if(p.usePower(player)) {
+                mana -= p.getManaCost();
+                updateMana();
+            }
         }
     }
 
@@ -55,9 +57,11 @@ public class Stoneholder {
                 break;
             }
         if(p != null && mana >= p.getManaCost()) {
-            p.usePower(player);
-            mana -= p.getManaCost();
-            updateMana();
+            player.setCooldown(i.getType(), 10);
+            if(p.usePower(player)) {
+                mana -= p.getManaCost();
+                updateMana();
+            }
         }
     }
 
@@ -80,11 +84,15 @@ public class Stoneholder {
     }
 
     public void setStonePower(Power p) {
+        Stone stone = null;
         for(Stone s: stones.keySet())
             if(s.getPowerSet().contains(p)) {
                 stones.put(s, p);
+                stone = s;
                 break;
             }
+        if(stone != null)
+            manaPreview(stone.getStoneItem());
     }
 
     public boolean addStone(Stone stone) {
@@ -106,11 +114,14 @@ public class Stoneholder {
             stones.remove(stone);
             actionBarMessage("Lost " + stone);
             for (ItemStack i : stone.getPlayerItems())
-                player.getInventory().removeItem(i);
+                for(ItemStack pi: player.getInventory().getContents())
+                    if(StoneholdersBase.comparePowerItems(i, pi)) player.getInventory().removeItem(pi);
             for (PassivePower p : stone.getPassivePowerSet())
                 p.deactivatePower(player);
         } else
             return false;
+        if(!isStoneholder())
+            previewBar.removePlayer(player);
         updateMaxMana();
         return true;
     }
@@ -150,8 +161,28 @@ public class Stoneholder {
         manaBar.setProgress(Math.max(0, mana)/maxMana);
     }
 
+    public void manaPreview(ItemStack i) {
+        Stone s = StoneholdersBase.getStoneFromItem(i);
+        if(s == null || stones.get(s) == null) {
+            UniquePower p = null;
+            for(Stone stone: stones.keySet())
+                if(stone.getUniquePowerMap().containsKey(i)) {
+                    p = stone.getUniquePowerMap().get(i);
+                    break;
+                }
+            if(p != null) {
+                previewBar.setProgress(Math.min(1, p.getManaCost()/maxMana));
+                previewBar.addPlayer(player);
+            } else
+                previewBar.removePlayer(player);
+        } else {
+            previewBar.setProgress(Math.min(1, stones.get(s).getManaCost()/maxMana));
+            previewBar.addPlayer(player);
+        }
+    }
+
     private void updateMaxMana() {
-        maxMana = 100 + 10 * stones.size();
+        maxMana = 80 + 20 * stones.size();
         if(isStoneholder())
             manaBar.addPlayer(player);
         else

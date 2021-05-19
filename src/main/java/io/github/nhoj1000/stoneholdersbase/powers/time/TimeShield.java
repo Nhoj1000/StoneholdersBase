@@ -21,10 +21,9 @@ public class TimeShield implements UniquePower {
     }
 
     @Override
-    public int usePower(Player player) {
+    public boolean usePower(Player player) {
         player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, slowTime * 20, slowLevel));
-
-        return 1;
+        return true;
     }
 
     @Override

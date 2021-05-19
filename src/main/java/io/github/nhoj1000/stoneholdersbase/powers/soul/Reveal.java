@@ -21,7 +21,7 @@ public class Reveal implements Power {
     }
 
     @Override
-    public int usePower(Player player) {
+    public boolean usePower(Player player) {
         List<Entity> nearby = player.getNearbyEntities(radius, radius, radius);
         for (Entity ent : nearby)
             if (ent instanceof Player)
@@ -29,8 +29,7 @@ public class Reveal implements Power {
 
         player.sendMessage(ChatColor.GOLD + "All players within " + radius + " blocks revealed.");
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BEACON_AMBIENT, 10, 1.5f);
-
-        return 0;
+        return true;
     }
 
     @Override

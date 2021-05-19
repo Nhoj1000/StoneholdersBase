@@ -26,7 +26,7 @@ public class Pause implements Power {
     }
 
     @Override
-    public int usePower(Player player) {
+    public boolean usePower(Player player) {
         player.sendMessage(ChatColor.GREEN + "Time Pause activated for " + time + " seconds!");
         List<Entity> entities = player.getNearbyEntities(radius, radius, radius);
         Map<Entity, Vector> speeds = new HashMap<>();
@@ -54,8 +54,7 @@ public class Pause implements Power {
             }
             player.sendMessage(ChatColor.GREEN + "Time Pause deactivated!");
         }, time * 20L);
-
-        return 1;
+        return true;
     }
 
     @Override

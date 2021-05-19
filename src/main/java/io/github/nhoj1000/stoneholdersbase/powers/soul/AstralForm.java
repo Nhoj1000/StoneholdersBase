@@ -22,7 +22,7 @@ public class AstralForm implements Power {
     }
 
     @Override
-    public int usePower(Player player) {
+    public boolean usePower(Player player) {
         Zombie place = (Zombie) player.getWorld().spawnEntity(player.getLocation(), EntityType.ZOMBIE);
         place.setCustomName(player.getName());
         place.setCustomNameVisible(true);
@@ -49,8 +49,7 @@ public class AstralForm implements Power {
             player.setHealth(place.getHealth());
             place.remove();
         }, astralTime * 20L);
-
-        return 0;
+        return true;
     }
 
     @Override

@@ -27,11 +27,11 @@ public class NoMana implements CommandExecutor {
             }
         }
 
-        if(s != null) {
+        if(s.isStoneholder()) {
             if (s.toggleManaRequired())
-                s.getPlayer().sendMessage("Mana no longer required!");
-            else
                 s.getPlayer().sendMessage("Mana now required!");
+            else
+                s.getPlayer().sendMessage("Mana no longer required!");
         } else
             sender.sendMessage(ChatColor.RED + "User is not a stoneholder!");
 

@@ -25,12 +25,12 @@ public class Disguise implements Power {
     }
 
     @Override
-    public int usePower(Player player) {
+    public boolean usePower(Player player) {
         if(!disguisedUsers.containsKey(player.getUniqueId())) {
             Block target = player.getTargetBlockExact(range);
             if(target == null) {
                 player.sendMessage("Block out of range!");
-                return -1;
+                return false;
             }
             player.setGameMode(GameMode.SPECTATOR);
             player.setFlySpeed(0);
@@ -46,10 +46,11 @@ public class Disguise implements Power {
             user.task = Bukkit.getScheduler().runTaskLater(StoneholdersBase.getInstance(),
                     () -> unDisguise(player), maxTime * 20L);
             disguisedUsers.put(player.getUniqueId(), user);
+            return true;
         } else {
             unDisguise(player);
+            return false;
         }
-        return -1;
     }
 
     private void unDisguise(Player player) {

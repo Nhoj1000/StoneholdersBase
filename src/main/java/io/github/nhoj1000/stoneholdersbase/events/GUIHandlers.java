@@ -1,7 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.events;
 
 import io.github.nhoj1000.stoneholdersbase.Stone;
-import io.github.nhoj1000.stoneholdersbase.Stoneholder;
 import io.github.nhoj1000.stoneholdersbase.StoneholdersBase;
 import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import org.bukkit.ChatColor;
@@ -18,17 +17,23 @@ public class GUIHandlers implements Listener {
     public void onPlayerInventoryClick(InventoryClickEvent e) {
         if(e.getView().getTitle().equals(ChatColor.DARK_GRAY + "Power Selection")) {
             Player player = (Player) e.getWhoClicked();
-
-            if(e.getCurrentItem() == null) return;
             ItemStack item = e.getCurrentItem();
-            if(item.getType() == Material.BARRIER) player.closeInventory();
+
+            if(item == null) return;
+            if(item.getType() == Material.BARRIER) {
+                player.closeInventory();
+                e.setCancelled(true);
+            }
 
             for(Stone s: StoneholdersBase.getStoneNameMap().values())
-                for(Power p: s.getPowerSet())
-                    if(p.getTool().equals(item)) {
+                for(Power p: s.getPowerSet()) {
+                    if (StoneholdersBase.comparePowerItems(p.getTool(), item)) {
                         StoneholdersBase.getStoneholder(player).setStonePower(p);
+                        player.closeInventory();
+                        e.setCancelled(true);
                         break;
                     }
+                }
         }
     }
 }

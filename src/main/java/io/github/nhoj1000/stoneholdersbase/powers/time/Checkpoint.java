@@ -23,7 +23,7 @@ public class Checkpoint implements Power {
     }
 
     @Override
-    public int usePower(Player player) {
+    public boolean usePower(Player player) {
         Location loc = player.getLocation();
         double health = player.getHealth();
         int food = player.getFoodLevel();
@@ -47,8 +47,7 @@ public class Checkpoint implements Power {
             for (PotionEffect effect : potions)
                     player.addPotionEffect(effect);
         }, recallTime * 20L);
-
-        return 1;
+        return true;
     }
 
     @Override

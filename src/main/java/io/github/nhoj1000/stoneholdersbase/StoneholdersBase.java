@@ -10,8 +10,10 @@ import io.github.nhoj1000.stoneholdersbase.powers.time.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -41,6 +43,7 @@ public final class StoneholdersBase extends JavaPlugin {
         pm.registerEvents(new PlayerDeath(), this);
         pm.registerEvents(new BowShootEvent(), this);
         pm.registerEvents(new EntityMovingEvent(), this);
+        pm.registerEvents(new PlayerScroll(), this);
 
         getCommand("stone").setExecutor(new StoneSetCommand());
         getCommand("noMana").setExecutor(new NoMana());
@@ -75,7 +78,7 @@ public final class StoneholdersBase extends JavaPlugin {
         registerStone("power", powerStone);
 
         Stone realityStone = new Stone(ChatColor.RED + "Reality stone", 2);
-        realityStone.registerPowers(new TNTWand(30, 15), new Disguise(30, 5));
+        realityStone.registerPowers(new TNTWand(30, 15), new Disguise(30, 5), new GenerateArrow(5));
         realityStone.registerUniquePowers(new GlassBow(300));
         registerStone("reality", realityStone);
 
@@ -139,6 +142,22 @@ public final class StoneholdersBase extends JavaPlugin {
 
     public static StoneholdersBase getInstance() {
         return plugin;
+    }
+
+    //Used to compare item types for power
+    public static boolean comparePowerItems(ItemStack i1, ItemStack i2) {
+        if(i1 == null && i2 == null) return true;
+        if(i1 == null || i2 == null) return false;
+        if (i1.getType() != i2.getType()) return false;
+
+        ItemMeta m1 = i1.getItemMeta();
+        ItemMeta m2 = i2.getItemMeta();
+        if(m1 == null && m2 == null) return true;
+        if(m1 == null || m2 == null) return false;
+        if(!m1.getDisplayName().equals(m2.getDisplayName())) return false;
+        if(m1.getLore() != null && m2.getLore() != null && !m1.getLore().equals(m2.getLore())) return false;
+        if(m1 instanceof Damageable && m2 instanceof Damageable && ((Damageable) m1).getDamage() != ((Damageable) m2).getDamage()) return false;
+        return (m1.isUnbreakable() == m2.isUnbreakable());
     }
     //endregion
 }

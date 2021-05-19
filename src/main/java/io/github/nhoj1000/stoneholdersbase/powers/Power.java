@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public interface Power {
-    int usePower(Player player);
+    boolean usePower(Player player);
     ItemStack getTool();
     int getManaCost();
 }

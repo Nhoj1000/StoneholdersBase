@@ -21,12 +21,11 @@ public class PowerFireball implements Power {
 
 
     @Override
-    public int usePower(Player player) {
+    public boolean usePower(Player player) {
         Fireball fireball = (Fireball) player.getWorld().spawnEntity(player.getEyeLocation().add(player.getEyeLocation().getDirection()), EntityType.FIREBALL);
         fireball.setYield(yield);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GHAST_SHOOT, 1, 1);
-
-        return 120;
+        return true;
     }
 
     @Override

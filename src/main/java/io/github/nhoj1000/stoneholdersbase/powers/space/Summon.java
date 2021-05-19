@@ -21,21 +21,20 @@ public class Summon implements Power {
     }
 
     @Override
-    public int usePower(Player player) {
+    public boolean usePower(Player player) {
         Random random = new Random();
         int randX, randZ;
         for (int i = 0; i < numZombies; i++) {
             randX = random.nextInt(spawnRange);
             randZ = random.nextInt(spawnRange);
             Zombie target = (Zombie) player.getWorld().spawnEntity(player.getLocation()
-                    .add(randX - spawnRange/2, 100, randZ - spawnRange/2), EntityType.ZOMBIE);
+                    .add(randX - spawnRange/2F, 100, randZ - spawnRange/2F), EntityType.ZOMBIE);
             target.getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
             target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
             target.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 1));
             target.setCustomName(getZombieName());
         }
-
-        return 1;
+        return true;
     }
 
     @Override

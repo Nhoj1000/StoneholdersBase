@@ -23,19 +23,19 @@ public class TNTWand implements Power {
     }
 
     @Override
-    public int usePower(Player player) {
+    public boolean usePower(Player player) {
         Block block = player.getTargetBlockExact(range);
-        if(block == null) {
+        if(block == null)
             player.sendMessage(ChatColor.RED + "Block out of range!");
-            return 0;   //unsuccessful cooldown time
-        } else {
+        else {
             block.setType(Material.AIR);
             TNTPrimed tnt = (TNTPrimed) player.getWorld().spawnEntity(block.getLocation().add(0.5, 0, 0.5), EntityType.PRIMED_TNT);
             tnt.setFuseTicks(100);
             tnt.setYield(yield);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, 2, 1);
-            return 1;   //Successful cooldown time
+            return true;
         }
+        return false;
     }
 
     @Override

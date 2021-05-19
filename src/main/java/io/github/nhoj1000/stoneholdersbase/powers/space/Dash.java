@@ -21,7 +21,7 @@ public class Dash implements Power {
     }
 
     @Override
-    public int usePower(Player player) {
+    public boolean usePower(Player player) {
         List<Block> target = player.getLastTwoTargetBlocks(null, dashDistance);
         List<Entity> rider = player.getNearbyEntities(0.5, 1, 0.5);
         Vector velocity = player.getVelocity();
@@ -40,8 +40,7 @@ public class Dash implements Power {
 
         if (!rider.isEmpty())
             rider.get(0).teleport(player);
-
-        return 0;
+        return true;
     }
 
     @Override

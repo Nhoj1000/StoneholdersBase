@@ -14,13 +14,12 @@ import java.util.Collections;
 
 public class Powerup implements Power {
     @Override
-    public int usePower(Player player) {
+    public boolean usePower(Player player) {
         player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 160, 2));
         player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 160, 1));
         player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 120, 1));
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 2, 1.3f);
-
-        return 0;   //TODO cooldown time
+        return true;
     }
 
     @Override
