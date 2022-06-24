@@ -16,12 +16,12 @@ import org.bukkit.util.Vector;
 import java.util.*;
 
 public class Disguise implements Power {
-    private static int range, maxTime;
-    private static Map<UUID, DisguisedUser> disguisedUsers = new HashMap<>();
+    private final int range, maxTime;
+    private static final Map<UUID, DisguisedUser> disguisedUsers = new HashMap<>();
 
     public Disguise(int range, int maxTime) {
-        Disguise.range = range;
-        Disguise.maxTime = maxTime;
+        this.range = range;
+        this.maxTime = maxTime;
     }
 
     @Override
@@ -67,7 +67,7 @@ public class Disguise implements Power {
         return Stone.generateStoneTool(Material.GOLDEN_SHOVEL, 2, "Disguise", Collections.singletonList(""));
     }
 
-    private class DisguisedUser{
+    private static class DisguisedUser{
         public Block block;
         public Material material;
         public BukkitTask task;

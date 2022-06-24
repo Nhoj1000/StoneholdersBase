@@ -7,10 +7,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class GenerateArrow implements Power {
-    private static int MAX_ARROWS;
+    private static int maxArrows;
 
     public GenerateArrow(int maxArrows) {
-        MAX_ARROWS = maxArrows;
+        GenerateArrow.maxArrows = maxArrows;
     }
 
     @Override
@@ -19,7 +19,7 @@ public class GenerateArrow implements Power {
         ItemStack comparison = GlassBow.getGlassArrow();
         for(ItemStack item: player.getInventory().getContents())
             if(StoneholdersBase.comparePowerItems(item, comparison)) arrows = item;
-        if (arrows == null || arrows.getAmount() < MAX_ARROWS) {
+        if (arrows == null || arrows.getAmount() < maxArrows) {
             player.getInventory().addItem(GlassBow.getGlassArrow());
             return true;
         }
@@ -38,6 +38,6 @@ public class GenerateArrow implements Power {
     }
 
     public static int getMaxArrows() {
-        return MAX_ARROWS;
+        return maxArrows;
     }
 }

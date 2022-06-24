@@ -15,11 +15,11 @@ import java.util.Collections;
 
 
 public class TNTWand implements Power {
-    private static int range, yield;
+    private final int range, yield;
 
     public TNTWand(int range, int yield) {
-        TNTWand.range = range; //30
-        TNTWand.yield = yield; //15
+        this.range = range; //30
+        this.yield = yield; //15
     }
 
     @Override

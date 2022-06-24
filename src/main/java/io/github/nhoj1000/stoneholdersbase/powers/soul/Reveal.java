@@ -14,10 +14,10 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.*;
 
 public class Reveal implements Power {
-    private static int radius;
+    private final int radius;
 
     public Reveal(int radius) {
-        Reveal.radius = radius;
+        this.radius = radius;
     }
 
     @Override

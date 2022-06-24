@@ -15,10 +15,10 @@ import java.util.Collections;
 
 
 public class AstralForm implements Power {
-    private static int astralTime;
+    private final int astralTime;
 
     public AstralForm(int astralTime) {
-        AstralForm.astralTime = astralTime;
+        this.astralTime = astralTime;
     }
 
     @Override

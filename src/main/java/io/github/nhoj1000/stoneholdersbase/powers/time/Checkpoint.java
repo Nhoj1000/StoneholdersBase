@@ -13,12 +13,9 @@ import java.util.*;
 
 public class Checkpoint implements Power {
     private static final Set<UUID> immortals = new HashSet<>();
-
     private final int recallTime;
-    private final StoneholdersBase plugin;
 
     public Checkpoint(int recallTime) {
-        plugin = StoneholdersBase.getInstance();
         this.recallTime = recallTime;
     }
 
@@ -33,7 +30,7 @@ public class Checkpoint implements Power {
         player.sendMessage(ChatColor.GREEN + "Checkpoint set. Returning in " + recallTime + " seconds");
         immortals.add(player.getUniqueId());
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        Bukkit.getScheduler().runTaskLater(StoneholdersBase.getInstance(), () -> {
             player.teleport(loc);
             player.setGameMode(GameMode.SURVIVAL);
             player.setFireTicks(0);

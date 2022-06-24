@@ -9,7 +9,9 @@ import io.github.nhoj1000.stoneholdersbase.powers.space.*;
 import io.github.nhoj1000.stoneholdersbase.powers.time.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -18,6 +20,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,15 +62,13 @@ public final class StoneholdersBase extends JavaPlugin {
             }
         }.runTaskTimer(this, 0L, 20L);
 
-        for(Player p: Bukkit.getOnlinePlayers())
-            initializeStoneholder(p);
+        Bukkit.getOnlinePlayers().forEach(StoneholdersBase::initializeStoneholder);
     }
 
     @Override
     public void onDisable() {
         super.onDisable();
-        for(Stoneholder s: stoneholderMap.values())
-            s.clearStones();
+        stoneholderMap.values().forEach(Stoneholder::clearStones);
     }
 
     //region Stone helper methods
@@ -83,7 +84,7 @@ public final class StoneholdersBase extends JavaPlugin {
         registerStone("reality", realityStone);
 
         Stone soulStone = new Stone(ChatColor.GOLD + "Soul stone", 3);
-        soulStone.registerPowers(new Reveal(50), new AstralForm(5));
+        soulStone.registerPowers(new Reveal(50), new AstralForm(5), new PsychOut(30));
         soulStone.registerPassivePowers(new SoulCollector(20, 1, 4, 8));
         registerStone("soul", soulStone);
 
@@ -158,6 +159,16 @@ public final class StoneholdersBase extends JavaPlugin {
         if(m1.getLore() != null && m2.getLore() != null && !m1.getLore().equals(m2.getLore())) return false;
         if(m1 instanceof Damageable && m2 instanceof Damageable && ((Damageable) m1).getDamage() != ((Damageable) m2).getDamage()) return false;
         return (m1.isUnbreakable() == m2.isUnbreakable());
+    }
+
+    //Helper method to determine if one player is looking at another
+    //Props to Mr.Midnight on spigotmc.org
+    public static boolean isLookingAt(Player player, LivingEntity entity) {
+        Location eye = player.getEyeLocation();
+        Vector toEntity = entity.getEyeLocation().toVector().subtract(eye.toVector());
+        double dot = toEntity.normalize().dot(eye.getDirection());
+
+        return dot > 0.99D;
     }
     //endregion
 }

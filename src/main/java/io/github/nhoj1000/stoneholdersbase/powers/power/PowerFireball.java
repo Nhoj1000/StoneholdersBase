@@ -13,10 +13,10 @@ import java.util.Collections;
 
 
 public class PowerFireball implements Power {
-    private static int yield;
+    private final int yield;
 
     public PowerFireball(int yield) {
-        PowerFireball.yield = yield;
+        this.yield = yield;
     }
 
 
