@@ -15,25 +15,24 @@ public class NoMana implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Stoneholder s;
 
-        if(args.length == 0 && sender instanceof Player)
+        if(args.length == 0 && sender instanceof Player) {
             s = StoneholdersBase.getStoneholder((Player) sender);
-        else {
+        } else {
             Player otherPlayer = Bukkit.getPlayer(args[0]);
-            if(otherPlayer != null)
+            if(otherPlayer != null) {
                 s = StoneholdersBase.getStoneholder(otherPlayer);
-            else {
+            } else {
                 sender.sendMessage(ChatColor.RED + "Player not found");
                 return true;
             }
         }
 
-        if(s.isStoneholder()) {
-            if (s.toggleManaRequired())
-                s.getPlayer().sendMessage("Mana now required!");
-            else
-                s.getPlayer().sendMessage("Mana no longer required!");
-        } else
+        if(s.hasStones()) {
+            String message = String.format("Mana %s required!", s.toggleManaRequired() ? "now" : "no longer");
+            s.getPlayer().sendMessage(message);
+        } else {
             sender.sendMessage(ChatColor.RED + "User is not a stoneholder!");
+        }
 
         return true;
     }

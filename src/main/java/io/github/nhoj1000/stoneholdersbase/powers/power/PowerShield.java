@@ -8,6 +8,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import java.util.*;
 
@@ -22,16 +23,22 @@ public class PowerShield implements UniquePower {
 
     @Override
     public boolean usePower(Player player) {
-        List<Entity> entities = player.getNearbyEntities(radius, radius, radius);
-        for (Entity e : entities)
-            e.setVelocity(e.getLocation().subtract(player.getEyeLocation()).toVector().normalize().multiply(powerMultiplier));
+        player.getNearbyEntities(radius, radius, radius).forEach(e -> {
+            double distance = player.getLocation().distance(e.getLocation());
+            e.setVelocity(e.getLocation().subtract(player.getLocation())
+                    .toVector()
+                    .normalize()
+                    .multiply(powerMultiplier)
+                    .multiply((radius - distance) * 0.5)
+                    .add(new Vector(0, 1, 0)));
+        });
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST_FAR, 100, 1);
         return true;
     }
 
     @Override
     public Set<ItemStack> getItems() {
-        return new HashSet<>(Collections.singletonList(getPowerShield()));
+        return Collections.singleton(getPowerShield());
     }
 
     @Override

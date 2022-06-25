@@ -26,15 +26,14 @@ public class Scatter implements Power {
         Location center = world.getWorldBorder().getCenter();
         int size = (int) world.getWorldBorder().getSize();
 
-        List<Entity> nearby = player.getNearbyEntities(grabRange, grabRange, grabRange);
-
-        for (Entity entity : nearby) {
+        player.getNearbyEntities(grabRange, grabRange, grabRange).forEach(e -> {
             int randX = limit(player.getLocation().getBlockX() - scatterRange/2 + random.nextInt(scatterRange),
                     center.getBlockX() - size/2, center.getBlockX() + size/2);
             int randZ = limit(player.getLocation().getBlockZ() - scatterRange/2 + random.nextInt(scatterRange),
                     center.getBlockZ() - size/2, center.getBlockZ() + size/2);
-            entity.teleport(new Location(world, randX, world.getHighestBlockYAt(randX, randZ) + 1, randZ));
-        }
+            e.teleport(new Location(world, randX, world.getHighestBlockYAt(randX, randZ) + 1, randZ));
+        });
+
         return true;
     }
 

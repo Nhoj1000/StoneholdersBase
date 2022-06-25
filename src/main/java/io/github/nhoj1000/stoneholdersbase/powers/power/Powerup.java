@@ -9,15 +9,18 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 
 public class Powerup implements Power {
     @Override
     public boolean usePower(Player player) {
-        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 160, 2));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 160, 1));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 120, 1));
+        player.addPotionEffects(Arrays.asList(
+                new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 160, 2),
+                new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 160, 1),
+                new PotionEffect(PotionEffectType.SLOW, 120, 1)
+        ));
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 2, 1.3f);
         return true;
     }

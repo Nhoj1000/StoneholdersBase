@@ -6,6 +6,7 @@ import io.github.nhoj1000.stoneholdersbase.powers.reality.GlassBow;
 import io.github.nhoj1000.stoneholdersbase.powers.time.Pause;
 import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,36 +17,42 @@ import org.bukkit.inventory.meta.PotionMeta;
 public class EntityDamagedByEntity implements Listener{
     @EventHandler
     public void onHit(EntityDamageByEntityEvent e) {
-        if(Pause.isFrozen(e.getEntity()))
+        if(Pause.isFrozen(e.getEntity())) {
             e.setCancelled(true);
-
+        }
 
         if(e.getDamager() instanceof Arrow) {
             Arrow arrow = (Arrow) e.getDamager();
             if (arrow.getCustomEffects().equals(((PotionMeta) GlassBow.getGlassArrow().getItemMeta()).getCustomEffects())) {
                 Player shooter = (Player) arrow.getShooter();
                 Stoneholder sh = StoneholdersBase.getStoneholder(shooter);
-                if (sh.getStones().contains(StoneholdersBase.getStoneFromName("reality")))
-                    if(e.getEntity() instanceof LivingEntity) {
-                        if (((LivingEntity) e.getEntity()).getHealth() - e.getDamage() > 0)
-                            GlassBow.setTarget(shooter, e.getEntity(), true);
-                        else
-                            GlassBow.clearTarget(shooter, false);
-                    } else
+                if (sh.hasStone("reality")) {
+                    if (isEntityDead(e.getEntity(), e.getDamage())) {
+                        GlassBow.clearTarget(shooter, false);
+                    } else {
                         GlassBow.setTarget(shooter, e.getEntity(), true);
+                    }
+                }
             }
         }
 
         if(e.getEntity() instanceof Player) {
             Player p = (Player) e.getEntity();
-            if(!StoneholdersBase.isStoneholder(p)) return;
+            Stoneholder stoneholder = StoneholdersBase.getStoneholder(p);
+            System.out.println(stoneholder.hasStone("power"));
+            System.out.println(p.isBlocking());
+            System.out.println(p.isSneaking());
 
-            Stoneholder s = StoneholdersBase.getStoneholder(p);
-            if(p.isBlocking() && p.isSneaking())
-                if(p.getInventory().getItemInMainHand().getType() == Material.SHIELD)
-                    s.useUniquePower(p.getInventory().getItemInMainHand());
-                else
-                    s.useUniquePower(p.getInventory().getItemInOffHand());
+            if(stoneholder.hasStone("power") && p.isBlocking() && p.isSneaking()) {
+                stoneholder.useUniquePower(p.getInventory().getItemInMainHand().getType() == Material.SHIELD
+                        ? p.getInventory().getItemInMainHand()
+                        : p.getInventory().getItemInOffHand());
+            }
         }
+    }
+
+    private boolean isEntityDead(Entity e, double damage) {
+        return (e instanceof LivingEntity)
+                && (((LivingEntity) e).getHealth() - damage > 0);
     }
 }

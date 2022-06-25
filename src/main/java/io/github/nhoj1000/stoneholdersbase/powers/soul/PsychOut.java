@@ -34,7 +34,7 @@ public class PsychOut implements Power {
             return false;
         }
 
-        target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 10, 0, false, false));
+        target.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, 10, 0, false, false));
         target.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 10, 9, false, false));
         target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 10, 0, false, false));
         return true;

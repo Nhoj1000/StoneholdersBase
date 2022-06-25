@@ -25,38 +25,34 @@ public class StoneItemTransfer implements Listener {
         ItemStack item = e.getItemDrop().getItemStack();
         Stone stone = StoneholdersBase.getStoneFromItem(item);
 
-        if(stone != null)
+        if(stone != null) {
             sh.removeStone(stone);
-        else {
-            for(Stone s: sh.getStones())
-                for(ItemStack i: s.getPlayerItems())
-                    if(StoneholdersBase.comparePowerItems(i, item))
-                        e.setCancelled(true);
+        } else if(sh.getStones().stream()
+                    .flatMap(s -> s.getPlayerItems().stream())
+                    .anyMatch(i -> StoneholdersBase.comparePowerItems(i, item))) {
+            e.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onItemPickup(EntityPickupItemEvent e) {
-        if(!(e.getEntity() instanceof Player)) return;
+        if(!(e.getEntity() instanceof Player)) {return;}
         Player p = (Player) e.getEntity();
-        Stoneholder sh = StoneholdersBase.getStoneholder(p);
+        Stoneholder stoneholder = StoneholdersBase.getStoneholder(p);
         ItemStack item = e.getItem().getItemStack();
-        Stone s = StoneholdersBase.getStoneFromItem(item);
+        Stone stone = StoneholdersBase.getStoneFromItem(item);
 
-        if(s != null && !sh.getStones().contains(s)) {
-            sh.addStone(s);
+        if(stone != null && !stoneholder.getStones().contains(stone)) {
+            stoneholder.addStone(stone);
             e.getItem().remove();
             e.setCancelled(true);
         }
 
-        if(StoneholdersBase.comparePowerItems(item, GlassBow.getGlassArrow())) {
-            ItemStack arrows = null;
-            ItemStack comparison = GlassBow.getGlassArrow();
-            for(ItemStack temp: p.getInventory().getContents())
-                if(StoneholdersBase.comparePowerItems(temp, comparison)) arrows = item;
-            if (arrows == null || arrows.getAmount() < GenerateArrow.getMaxArrows())
-                p.getInventory().addItem(GlassBow.getGlassArrow());
-            p.sendMessage(ChatColor.RED + "Maximum arrow count reached!");
+        if(stoneholder.hasStone("reality")
+                && StoneholdersBase.comparePowerItems(item, GlassBow.getGlassArrow())) {
+            new GenerateArrow(5).usePower(p);
+            e.getItem().remove();
+            e.setCancelled(true);
         }
     }
 }

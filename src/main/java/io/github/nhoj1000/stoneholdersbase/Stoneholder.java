@@ -19,7 +19,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.*;
 
 public class Stoneholder {
-    private final Player player;
+    private Player player;
     private final Map<Stone, Power> stones = new HashMap<>();  //currently held stones
     private static double MANA_REGEN = 1;    //passive mana regen per second
     private double mana, maxMana;   //current mana and max mana, respectively
@@ -37,6 +37,11 @@ public class Stoneholder {
     public Player getPlayer() {
         return player;
     }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
 
     public void useNormalPower(Stone s) {
         Power p = stones.get(s);
@@ -96,6 +101,7 @@ public class Stoneholder {
     }
 
     public boolean addStone(Stone stone) {
+        System.out.println(stones);
         if(!stones.containsKey(stone)) {
             stones.put(stone, null);
             actionBarMessage("Acquired " + stone);
@@ -110,44 +116,46 @@ public class Stoneholder {
     }
 
     public boolean removeStone(Stone stone) {
-        if(stones.containsKey(stone)) {
-            stones.remove(stone);
-            actionBarMessage("Lost " + stone);
-            for (ItemStack i : stone.getPlayerItems())
-                for(ItemStack pi: player.getInventory().getContents())
-                    if(StoneholdersBase.comparePowerItems(i, pi)) player.getInventory().removeItem(pi);
-            for (PassivePower p : stone.getPassivePowerSet())
-                p.deactivatePower(player);
-        } else
-            return false;
-        if(!isStoneholder())
-            previewBar.removePlayer(player);
-        updateMaxMana();
-        return true;
+        boolean removed = stones.keySet().remove(stones.keySet().stream()
+            .filter(s -> s.equals(stone))
+            .peek(s -> {
+                actionBarMessage("Lost " + stone);
+                stone.getPlayerItems().forEach(i -> Arrays.stream(player.getInventory().getContents())
+                        .filter(pi -> StoneholdersBase.comparePowerItems(i, pi))
+                        .forEach(pi -> player.getInventory().removeItem(pi)));
+                s.getPassivePowerSet().forEach(pp -> pp.deactivatePower(player));
+            }).findFirst().orElse(null)
+        );
+
+        if(removed) {
+            manaPreview(player.getInventory().getItemInMainHand());
+            updateMaxMana();
+        }
+
+        return removed;
     }
 
     public void clearStones() {
-        Iterator<Stone> iterator = stones.keySet().iterator();
-        while (iterator.hasNext()) {
-            Stone stone = iterator.next();
-            for (ItemStack i : stone.getPlayerItems())
-                player.getInventory().removeItem(i);
-            for (PassivePower p : stone.getPassivePowerSet())
-                p.deactivatePower(player);
-            iterator.remove();
-        }
+        stones.keySet().forEach(s -> {
+            s.getPlayerItems().forEach(i -> player.getInventory().remove(i));
+            removeStone(s);
+        });
     }
 
     public Set<Stone> getStones() {
         return stones.keySet();
     }
 
-    public void actionBarMessage(String message) {
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));
+    public boolean hasStones() {
+        return stones.size() > 0;
     }
 
-    public boolean isStoneholder() {
-        return stones.size() > 0;
+    public boolean hasStone(String stoneName) {
+        return stones.containsKey(StoneholdersBase.getStoneFromName(stoneName));
+    }
+
+    public void actionBarMessage(String message) {
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));
     }
 
     //region Mana stuff
@@ -157,42 +165,52 @@ public class Stoneholder {
     }
 
     public void updateMana() {
-        if(!manaRequired) mana = maxMana;
-        manaBar.setProgress(Math.max(0, mana)/maxMana);
+        if(!manaRequired) {
+            mana = maxMana;
+        }
+        manaBar.setProgress(Math.max(0, mana) / maxMana);
     }
 
-    public void manaPreview(ItemStack i) {
-        Stone s = StoneholdersBase.getStoneFromItem(i);
-        if(s == null || stones.get(s) == null) {
-            UniquePower p = null;
-            for(Stone stone: stones.keySet())
-                if(stone.getUniquePowerMap().containsKey(i)) {
-                    p = stone.getUniquePowerMap().get(i);
-                    break;
-                }
-            if(p != null) {
-                previewBar.setProgress(Math.min(1, p.getManaCost()/maxMana));
-                previewBar.addPlayer(player);
-            } else
+    public void manaPreview(ItemStack item) {
+        Stone stone = StoneholdersBase.getStoneFromItem(item);
+        if(item == null || !hasStones()) {
+            previewBar.removePlayer(player);
+        }
+
+        if(stone == null) { //might still be holding a unique power item
+            UniquePower uniquePower = stones.keySet().stream()
+                    .filter(s -> s.getUniquePowerMap().containsKey(item))
+                    .map(s -> s.getUniquePowerMap().get(item))
+                    .findFirst().orElse(null);
+            if(uniquePower == null) {
                 previewBar.removePlayer(player);
+            } else {
+                previewBar.setProgress(Math.min(1, uniquePower.getManaCost()/maxMana));
+                previewBar.addPlayer(player);
+            }
+        } else if(stones.get(stone) == null) {
+            previewBar.removePlayer(player);
         } else {
-            previewBar.setProgress(Math.min(1, stones.get(s).getManaCost()/maxMana));
+            previewBar.setProgress(Math.min(1, stones.get(stone).getManaCost()/maxMana));
             previewBar.addPlayer(player);
         }
     }
 
-    private void updateMaxMana() {
+    public void updateMaxMana() {
         maxMana = 80 + 20 * stones.size();
-        if(isStoneholder())
+        if(hasStones()) {
             manaBar.addPlayer(player);
-        else
+        } else {
             manaBar.removePlayer(player);
+        }
     }
 
     public void boostManaRegen(double multiplier, int seconds) {
         double oldManaRegen = MANA_REGEN;
         MANA_REGEN *= multiplier;
-        Bukkit.getScheduler().runTaskLater(StoneholdersBase.getInstance(), () -> MANA_REGEN = oldManaRegen, seconds * 20L);
+        Bukkit.getScheduler().runTaskLater(StoneholdersBase.getInstance(),
+                () -> MANA_REGEN = oldManaRegen,
+                seconds * 20L);
     }
 
     //Toggles the need for mana

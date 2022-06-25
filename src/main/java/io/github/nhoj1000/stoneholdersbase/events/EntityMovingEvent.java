@@ -8,7 +8,8 @@ import org.bukkit.event.player.PlayerMoveEvent;
 public class EntityMovingEvent implements Listener {
     @EventHandler
     public void onEntityMove(PlayerMoveEvent e) {
-        if(Pause.isFrozen(e.getPlayer()))
+        if(Pause.isFrozen(e.getPlayer())) {
             e.setCancelled(true);
+        }
     }
 }

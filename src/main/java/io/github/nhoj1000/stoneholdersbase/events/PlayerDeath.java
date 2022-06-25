@@ -38,15 +38,14 @@ public class PlayerDeath implements Listener {
             Pause.setFrozen(player, true);
         } else {
             //soul collection code
-            for(Entity entity: player.getNearbyEntities(collectionRadius, collectionRadius, collectionRadius))
-                if(entity instanceof Player)
-                    SoulCollector.addSoul((Player) entity, player);
+            player.getNearbyEntities(collectionRadius, collectionRadius, collectionRadius).stream()
+                    .filter(ent -> ent instanceof Player)
+                    .forEach(ent -> SoulCollector.addSoul((Player) ent, player));
 
             //filters out item drops for stone power items
-            List<ItemStack> drops = e.getDrops();
-            for(Stone stone: StoneholdersBase.getStoneholder(player).getStones())
-                for(UniquePower up: stone.getUniquePowerMap().values())
-                    drops.removeAll(up.getItems());
+            StoneholdersBase.getStoneholder(player).getStones().stream()
+                    .flatMap(s -> s.getUniquePowerMap().values().stream())
+                    .forEach(up -> e.getDrops().removeAll(up.getItems()));
         }
     }
 }

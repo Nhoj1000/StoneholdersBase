@@ -57,8 +57,7 @@ public final class StoneholdersBase extends JavaPlugin {
         new BukkitRunnable() {
             @Override
             public void run() {
-                for(Stoneholder s: stoneholderMap.values())
-                    s.regen();
+                stoneholderMap.values().forEach(Stoneholder::regen);
             }
         }.runTaskTimer(this, 0L, 20L);
 
@@ -122,12 +121,17 @@ public final class StoneholdersBase extends JavaPlugin {
     }
 
     public static boolean isStoneholder(Player p) {
-        return getStoneholder(p).isStoneholder();
+        return getStoneholder(p).hasStones();
     }
 
     public static void initializeStoneholder(Player p) {
-        if(!stoneholderMap.containsKey(p.getUniqueId()))
+        Stoneholder stoneholder = stoneholderMap.get(p.getUniqueId());
+        if(stoneholder == null) {
             stoneholderMap.put(p.getUniqueId(), new Stoneholder(p));
+        } else {
+            stoneholder.setPlayer(p);
+            stoneholder.updateMaxMana();
+        }
     }
     //endregion
 
@@ -135,8 +139,9 @@ public final class StoneholdersBase extends JavaPlugin {
     public static ItemStack getPlayerHead(Player player) {
         ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) skull.getItemMeta();
-        if(meta != null)
+        if(meta != null) {
             meta.setOwningPlayer(player);
+        }
         skull.setItemMeta(meta);
         return skull;
     }
@@ -147,9 +152,8 @@ public final class StoneholdersBase extends JavaPlugin {
 
     //Used to compare item types for power
     public static boolean comparePowerItems(ItemStack i1, ItemStack i2) {
-        if(i1 == null && i2 == null) return true;
-        if(i1 == null || i2 == null) return false;
-        if (i1.getType() != i2.getType()) return false;
+        if(i1 == i2) {return true;}
+        if((i1 == null || i2 == null) || (i1.getType() != i2.getType())) {return false;}
 
         ItemMeta m1 = i1.getItemMeta();
         ItemMeta m2 = i2.getItemMeta();

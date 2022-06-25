@@ -69,14 +69,12 @@ public class Stone {
 
     @Override
     public int hashCode() {
-        return stoneName.hashCode();
+        return stoneName.hashCode() + getPlayerItems().hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof Stone)
-            return stoneName.equals(((Stone) obj).stoneName);
-        return false;
+        return hashCode() == obj.hashCode();
     }
 
     public static ItemStack generateStoneTool(Material m, int d, String name, List<String> lore) {

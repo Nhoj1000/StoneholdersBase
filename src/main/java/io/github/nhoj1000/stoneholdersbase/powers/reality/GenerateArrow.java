@@ -17,8 +17,11 @@ public class GenerateArrow implements Power {
     public boolean usePower(Player player) {
         ItemStack arrows = null;
         ItemStack comparison = GlassBow.getGlassArrow();
-        for(ItemStack item: player.getInventory().getContents())
-            if(StoneholdersBase.comparePowerItems(item, comparison)) arrows = item;
+        for(ItemStack item: player.getInventory().getContents()) {
+            if (StoneholdersBase.comparePowerItems(item, comparison)) {
+                arrows = item;
+            }
+        }
         if (arrows == null || arrows.getAmount() < maxArrows) {
             player.getInventory().addItem(GlassBow.getGlassArrow());
             return true;

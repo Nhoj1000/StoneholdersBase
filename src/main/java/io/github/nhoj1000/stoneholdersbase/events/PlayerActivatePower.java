@@ -18,45 +18,51 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class PlayerActivatePower implements Listener {
-    private static final Set<Material> ignoredBlocks = setIgnoredBlocks();
+    private static final Set<Material> ignoredBlocks = getIgnoredBlocks();
 
     @EventHandler
     public void onRightClick(PlayerInteractEvent e) {
         Player p = e.getPlayer();
-        if(e.getItem() != null && p.getCooldown(e.getItem().getType()) > 0) return;
-        //Special blocks that shouldn't trigger powers
-        if(e.getClickedBlock() != null && ignoredBlocks.contains(e.getClickedBlock().getType())) return;
+        if((e.getItem() != null && p.getCooldown(e.getItem().getType()) > 0)
+                || (e.getClickedBlock() != null && ignoredBlocks.contains(e.getClickedBlock().getType()))) {
+            return;
+        }
 
         Stoneholder sh = StoneholdersBase.getStoneholder(p);
-        if(sh.isStoneholder())
-            if(e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK)
+        if(sh.hasStones()) {
+            if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
                 sh.useNormalPower(StoneholdersBase.getStoneFromItem(e.getItem()));
-            else {
+            } else {
                 //Handles power swapping for a given stone
                 //Also used for special items with left click function like the glass bow
                 ItemStack item = p.getInventory().getItemInMainHand();
                 Stone s = StoneholdersBase.getStoneFromItem(item);
 
-                if(s != null)
+                if (s != null) {
                     sh.selectPowerGUI(s);
-                else if(sh.isStoneholder())
-                    if(item.equals(GlassBow.getGlassBow()))
-                        sh.useUniquePower(item);
+                } else if (sh.hasStone("reality") && item.equals(GlassBow.getGlassBow())) {
+                    sh.useUniquePower(item);
+                }
             }
+        }
     }
 
     /**
      * Utility method to load in the set of blocks that shouldn't trigger a power upon right click
      */
-    public static Set<Material> setIgnoredBlocks() {
-        Set<Material> ignored = new HashSet<>();
-        ignored.addAll(Tag.TRAPDOORS.getValues());
-        ignored.addAll(Tag.DOORS.getValues());
-        ignored.addAll(Tag.BUTTONS.getValues());
-        ignored.addAll(Tag.FENCE_GATES.getValues());
-        ignored.addAll(Tag.BEDS.getValues());
-        ignored.addAll(Arrays.asList(Material.REPEATER, Material.COMPARATOR, Material.LEVER, Material.DAYLIGHT_DETECTOR, Material.BELL));
+    public static Set<Material> getIgnoredBlocks() {
+        return new HashSet<>(){{
+            addAll(Tag.TRAPDOORS.getValues());
+            addAll(Tag.DOORS.getValues());
+            addAll(Tag.BUTTONS.getValues());
+            addAll(Tag.FENCE_GATES.getValues());
+            addAll(Tag.BEDS.getValues());
 
-        return ignored;
+            add(Material.REPEATER);
+            add(Material.COMPARATOR);
+            add(Material.LEVER);
+            add(Material.DAYLIGHT_DETECTOR);
+            add(Material.BELL);
+        }};
     }
 }

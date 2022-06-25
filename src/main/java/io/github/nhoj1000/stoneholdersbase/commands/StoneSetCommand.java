@@ -11,6 +11,7 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Command to set the target's stone
@@ -19,72 +20,92 @@ import java.util.*;
 public class StoneSetCommand implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        Player target;
+        if(args.length < 2) {return false;}
 
-        if(args.length > 1) {   //Ensures 2 args entered
-            target = Bukkit.getPlayer(args[1]);
-            if (target == null) //Finds target player
-                return informAndReturn(sender, ChatColor.RED + "Target not found!", true);
-            Stoneholder s = StoneholdersBase.getStoneholder(target);
-
-            if (args.length == 2) { //clear and list commands
-                if (!s.isStoneholder())
-                    return informAndReturn(sender,ChatColor.RED + "Target is not a stoneholder!", true);
-
-                if (args[0].equals("clear")) {
-                    s.clearStones();
-                    return informAndReturn(sender, "Target's stones have been cleared.", true);
-                } else if (args[0].equals("list")) {
-                    StringBuilder key = new StringBuilder(target.getName() + "'s stones:\n");
-                    for(Stone tempStone: s.getStones())
-                        key.append(ChatColor.WHITE).append("> ").append(tempStone).append("\n");
-                    return informAndReturn(sender, key.toString(), true);
-                }
-            } else if (args.length == 3) {  //add and remove commands
-                Stone stone = StoneholdersBase.getStoneFromName(args[2]);
-                if (stone == null)
-                    return informAndReturn(sender, ChatColor.RED + "Stone not found!", true);
-
-                if (args[0].equals("add")) {
-                    if (!s.isStoneholder()) sender.sendMessage(target.getName() + " is now a stoneholder.");
-                    if (s.addStone(stone)) sender.sendMessage(target.getName() + " has acquired the " + stone);
-                    else sender.sendMessage(target.getName() + " already has the " + stone);
-                    return true;
-                } else if (args[0].equals("remove")) {
-                    if(s.removeStone(stone)) sender.sendMessage(target.getName() + " no longer has the " + stone);
-                    else sender.sendMessage(target.getName() + " does not have the " + stone);
-                    if (!s.isStoneholder()) sender.sendMessage(target.getName() + " is no longer a stoneholder.");
-                    return true;
-                }
-            }
+        Player target = Bukkit.getPlayer(args[1]);
+        if (target == null) {
+            sender.sendMessage(ChatColor.RED + "Target not found!");
+        } else {
+            Stoneholder stoneholder = StoneholdersBase.getStoneholder(target);
+            return switch (args[0]) {
+                case "clear" -> clearStones(sender, stoneholder, args);
+                case "add" -> addStone(sender, stoneholder, args);
+                case "remove" -> removeStone(sender, stoneholder, args);
+                case "list" -> listStones(sender, stoneholder, args);
+                default -> false;
+            };
         }
-        return false;
+
+        return true;
+    }
+
+    public boolean clearStones(CommandSender sender, Stoneholder stoneholder, String[] args) {
+        if(stoneholder.hasStones()) {
+            stoneholder.clearStones();
+        } else {
+            sender.sendMessage(ChatColor.RED + args[1] + " is not a stoneholder!");
+        }
+        return true;
+    }
+
+    public boolean addStone(CommandSender sender, Stoneholder stoneholder, String[] args) {
+        if(args.length < 3) {return false;}
+
+        Stone stone = StoneholdersBase.getStoneFromName(args[2]);
+        if(stone == null) {
+            sender.sendMessage(args[2] + " is not a valid stone.");
+            return true;
+        } else if (!stoneholder.hasStones()) {
+            sender.sendMessage(args[1] + " is now a stoneholder.");
+        }
+        sender.sendMessage(String.format("%s %s %s",
+                args[1],
+                stoneholder.addStone(stone) ? "has acquired the" : "already has the",
+                stone
+                ));
+        return true;
+    }
+
+    public boolean removeStone(CommandSender sender, Stoneholder stoneholder, String[] args) {
+        if(args.length < 3) {return false;}
+
+        Stone stone = StoneholdersBase.getStoneFromName(args[2]);
+        if(stone == null) {
+            sender.sendMessage(args[2] + " is not a valid stone.");
+            return true;
+        }
+            sender.sendMessage(String.format("%s %s %s",
+                args[1],
+                stoneholder.removeStone(stone) ? "no longer has the" : "does not have the",
+                stone
+        ));
+        if (!stoneholder.hasStones()) {
+            sender.sendMessage(args[1] + " is no longer a stoneholder.");
+        }
+        return true;
+    }
+
+    public boolean listStones(CommandSender sender, Stoneholder stoneholder, String[] args) {
+        if(stoneholder.hasStones()) {
+            StringBuilder key = new StringBuilder(args[1] + "'s stones:\n");
+            stoneholder.getStones().forEach(s -> key.append(ChatColor.WHITE).append("> ").append(s).append("\n"));
+            sender.sendMessage(key.toString());
+        } else {
+            sender.sendMessage(ChatColor.RED + args[1] + " is not a stoneholder!");
+        }
+        return true;
     }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        switch (args.length) {
-            case 1:
-                return trimList(Arrays.asList("add", "remove", "clear", "list"), args[0]);
-            case 3:
-                return trimList(new ArrayList<>(StoneholdersBase.getStoneNameMap().keySet()), args[2]);
-            default:
-                return null;
-        }
+        return switch (args.length) {
+            case 1 -> trimList(Arrays.asList("add", "remove", "clear", "list"), args[0]);
+            case 3 -> trimList(new ArrayList<>(StoneholdersBase.getStoneNameMap().keySet()), args[2]);
+            default -> null;
+        };
     }
 
     private List<String> trimList(List<String> list, String start) {
-        List<String> listCopy = new ArrayList<>(list);
-        for(int i = 0; i < listCopy.size(); i++)
-            if(!listCopy.get(i).startsWith(start)) {
-                listCopy.remove(i);
-                i--;
-            }
-        return listCopy;
-    }
-
-    private boolean informAndReturn(CommandSender sender, String message, boolean returnValue) {
-        sender.sendMessage(message);
-        return returnValue;
+        return list.stream().filter(s -> s.startsWith(start)).collect(Collectors.toList());
     }
 }
