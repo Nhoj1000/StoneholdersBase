@@ -17,6 +17,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import static io.github.nhoj1000.stoneholdersbase.StoneConstants.REALITY_ID;
+
 public class PlayerActivatePower implements Listener {
     private static final Set<Material> ignoredBlocks = getIgnoredBlocks();
 
@@ -40,7 +42,7 @@ public class PlayerActivatePower implements Listener {
 
                 if (s != null) {
                     sh.selectPowerGUI(s);
-                } else if (sh.hasStone("reality") && item.equals(GlassBow.getGlassBow())) {
+                } else if (sh.hasStone(REALITY_ID) && item.equals(GlassBow.getGlassBow())) {
                     sh.useUniquePower(item);
                 }
             }

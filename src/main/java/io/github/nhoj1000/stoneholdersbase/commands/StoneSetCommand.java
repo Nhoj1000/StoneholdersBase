@@ -51,7 +51,7 @@ public class StoneSetCommand implements TabExecutor {
     public boolean addStone(CommandSender sender, Stoneholder stoneholder, String[] args) {
         if(args.length < 3) {return false;}
 
-        Stone stone = StoneholdersBase.getStoneFromName(args[2]);
+        Stone stone = StoneholdersBase.getStoneFromId(args[2]);
         if(stone == null) {
             sender.sendMessage(args[2] + " is not a valid stone.");
             return true;
@@ -61,7 +61,7 @@ public class StoneSetCommand implements TabExecutor {
         sender.sendMessage(String.format("%s %s %s",
                 args[1],
                 stoneholder.addStone(stone) ? "has acquired the" : "already has the",
-                stone
+                stone.getDisplayName()
                 ));
         return true;
     }
@@ -69,7 +69,7 @@ public class StoneSetCommand implements TabExecutor {
     public boolean removeStone(CommandSender sender, Stoneholder stoneholder, String[] args) {
         if(args.length < 3) {return false;}
 
-        Stone stone = StoneholdersBase.getStoneFromName(args[2]);
+        Stone stone = StoneholdersBase.getStoneFromId(args[2]);
         if(stone == null) {
             sender.sendMessage(args[2] + " is not a valid stone.");
             return true;
@@ -77,7 +77,7 @@ public class StoneSetCommand implements TabExecutor {
             sender.sendMessage(String.format("%s %s %s",
                 args[1],
                 stoneholder.removeStone(stone) ? "no longer has the" : "does not have the",
-                stone
+                stone.getDisplayName()
         ));
         if (!stoneholder.hasStones()) {
             sender.sendMessage(args[1] + " is no longer a stoneholder.");
@@ -100,7 +100,7 @@ public class StoneSetCommand implements TabExecutor {
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         return switch (args.length) {
             case 1 -> trimList(Arrays.asList("add", "remove", "clear", "list"), args[0]);
-            case 3 -> trimList(new ArrayList<>(StoneholdersBase.getStoneNameMap().keySet()), args[2]);
+            case 3 -> trimList(new ArrayList<>(StoneholdersBase.getAllStoneIds()), args[2]);
             default -> null;
         };
     }

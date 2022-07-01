@@ -24,7 +24,7 @@ public class GUIHandlers implements Listener {
                     e.setCancelled(true);
                 }
 
-                Power power = StoneholdersBase.getStoneNameMap().values().stream()
+                Power power = StoneholdersBase.getAllStones().stream()
                         .flatMap(s -> s.getPowerSet().stream())
                         .filter(p -> StoneholdersBase.comparePowerItems(p.getTool(), item))
                         .findFirst().orElse(null);

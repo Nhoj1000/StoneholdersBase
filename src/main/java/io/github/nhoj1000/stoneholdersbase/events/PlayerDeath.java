@@ -44,7 +44,7 @@ public class PlayerDeath implements Listener {
 
             //filters out item drops for stone power items
             StoneholdersBase.getStoneholder(player).getStones().stream()
-                    .flatMap(s -> s.getUniquePowerMap().values().stream())
+                    .flatMap(s -> s.getUniquePowerSet().stream())
                     .forEach(up -> e.getDrops().removeAll(up.getItems()));
         }
     }

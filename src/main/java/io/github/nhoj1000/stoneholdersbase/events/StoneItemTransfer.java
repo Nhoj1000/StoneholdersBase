@@ -14,6 +14,8 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 
+import static io.github.nhoj1000.stoneholdersbase.StoneConstants.REALITY_ID;
+
 //Handles the transfer of stones and stone items
 public class StoneItemTransfer implements Listener {
 
@@ -48,7 +50,7 @@ public class StoneItemTransfer implements Listener {
             e.setCancelled(true);
         }
 
-        if(stoneholder.hasStone("reality")
+        if(stoneholder.hasStone(REALITY_ID)
                 && StoneholdersBase.comparePowerItems(item, GlassBow.getGlassArrow())) {
             new GenerateArrow(5).usePower(p);
             e.getItem().remove();

@@ -1,6 +1,5 @@
 package io.github.nhoj1000.stoneholdersbase;
 
-import io.github.nhoj1000.stoneholdersbase.powers.PassivePower;
 import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import io.github.nhoj1000.stoneholdersbase.powers.UniquePower;
 import net.md_5.bungee.api.ChatMessageType;
@@ -17,6 +16,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static io.github.nhoj1000.stoneholdersbase.StoneConstants.SELECT_POWER_GUI_TITLE;
 
 public class Stoneholder {
     private Player player;
@@ -49,33 +51,36 @@ public class Stoneholder {
             player.setCooldown(s.getStoneItem().getType(), 10);
             if(p.usePower(player)) {
                 mana -= p.getManaCost();
-                updateMana();
+                updateManaBar();
             }
         }
     }
 
-    public void useUniquePower(ItemStack i) {
+    public void useUniquePower(ItemStack item) {
         UniquePower p = null;
-        for(Stone s: stones.keySet())
-            if(s.getUniquePowerMap().containsKey(i)) {
-                p = s.getUniquePowerMap().get(i);
+        for(Stone s: getStones()) {
+            p = s.getUniquePowerByItem(item);
+            if(p != null) {
                 break;
             }
+        }
         if(p != null && mana >= p.getManaCost()) {
-            player.setCooldown(i.getType(), 10);
+            player.setCooldown(item.getType(), 10);
             if(p.usePower(player)) {
                 mana -= p.getManaCost();
-                updateMana();
+                updateManaBar();
             }
         }
     }
 
     public void selectPowerGUI(Stone s) {
-        Inventory powerGUI = Bukkit.createInventory(null, 9, ChatColor.DARK_GRAY + "Power Selection");
+        Inventory powerGUI = Bukkit.createInventory(null, 9, SELECT_POWER_GUI_TITLE);
 
         ItemStack exit = new ItemStack(Material.BARRIER);
         ItemMeta exitMeta = exit.getItemMeta();
-        exitMeta.setDisplayName(ChatColor.RED + "Exit");
+        if(exitMeta != null) {
+            exitMeta.setDisplayName(ChatColor.RED + "Exit");
+        }
         exit.setItemMeta(exitMeta);
 
         ItemStack[] menuItems = new ItemStack[9];
@@ -88,58 +93,50 @@ public class Stoneholder {
         player.openInventory(powerGUI);
     }
 
-    public void setStonePower(Power p) {
-        Stone stone = null;
-        for(Stone s: stones.keySet())
-            if(s.getPowerSet().contains(p)) {
-                stones.put(s, p);
-                stone = s;
+    public void setStonePower(Power power) {
+        for(Stone s: getStones()) {
+            if (s.getPowerSet().contains(power)) {
+                stones.put(s, power);
+                updateManaPreviewBar(s.getStoneItem());
                 break;
             }
-        if(stone != null)
-            manaPreview(stone.getStoneItem());
+        }
     }
 
     public boolean addStone(Stone stone) {
-        System.out.println(stones);
-        if(!stones.containsKey(stone)) {
+        boolean alreadyHasStone = hasStone(stone);
+        if(!alreadyHasStone) {
             stones.put(stone, null);
-            actionBarMessage("Acquired " + stone);
-            for (ItemStack i : stone.getPlayerItems())
-                if(!player.getInventory().contains(i)) player.getInventory().addItem(i);
-            for (PassivePower p : stone.getPassivePowerSet())
-                p.activatePower(player);
-        } else
-            return false;
+            actionBarMessage("Acquired " + stone.getDisplayName());
+            stone.getPlayerItems().stream()
+                    .filter(i -> !player.getInventory().contains(i))
+                    .forEach(i -> player.getInventory().addItem(i));
+            stone.getPassivePowerSet().forEach(pp -> pp.activatePower(player));
+        }
         updateMaxMana();
-        return true;
+        return !alreadyHasStone;
     }
 
     public boolean removeStone(Stone stone) {
-        boolean removed = stones.keySet().remove(stones.keySet().stream()
-            .filter(s -> s.equals(stone))
-            .peek(s -> {
-                actionBarMessage("Lost " + stone);
-                stone.getPlayerItems().forEach(i -> Arrays.stream(player.getInventory().getContents())
-                        .filter(pi -> StoneholdersBase.comparePowerItems(i, pi))
-                        .forEach(pi -> player.getInventory().removeItem(pi)));
-                s.getPassivePowerSet().forEach(pp -> pp.deactivatePower(player));
-            }).findFirst().orElse(null)
-        );
-
-        if(removed) {
-            manaPreview(player.getInventory().getItemInMainHand());
+        boolean alreadyHasStone = hasStone(stone);
+        if(alreadyHasStone) {
+            stones.remove(stone);
+            actionBarMessage("Lost " + stone.getDisplayName());
+            stone.getPlayerItems().forEach(i -> Arrays.stream(player.getInventory().getContents())
+                    .filter(pi -> StoneholdersBase.comparePowerItems(i, pi))
+                    .forEach(pi -> player.getInventory().removeItem(pi)));
+            stone.getPassivePowerSet().forEach(pp -> pp.deactivatePower(player));
+            updateManaPreviewBar(player.getInventory().getItemInMainHand());
             updateMaxMana();
         }
-
-        return removed;
+        return alreadyHasStone;
     }
 
     public void clearStones() {
-        stones.keySet().forEach(s -> {
-            s.getPlayerItems().forEach(i -> player.getInventory().remove(i));
-            removeStone(s);
-        });
+        List<String> stoneIds = getStones().stream().map(Stone::toString).collect(Collectors.toList());
+        for(String stoneName: stoneIds) { //to avoid ConcurrentModificationException
+            removeStone(StoneholdersBase.getStoneFromId(stoneName));
+        }
     }
 
     public Set<Stone> getStones() {
@@ -151,7 +148,11 @@ public class Stoneholder {
     }
 
     public boolean hasStone(String stoneName) {
-        return stones.containsKey(StoneholdersBase.getStoneFromName(stoneName));
+        return hasStone(StoneholdersBase.getStoneFromId(stoneName));
+    }
+
+    public boolean hasStone(Stone stone) {
+        return stones.containsKey(stone);
     }
 
     public void actionBarMessage(String message) {
@@ -161,17 +162,17 @@ public class Stoneholder {
     //region Mana stuff
     public void regen() {
         mana = Math.min(maxMana, mana + MANA_REGEN);
-        updateMana();
+        updateManaBar();
     }
 
-    public void updateMana() {
+    public void updateManaBar() {
         if(!manaRequired) {
             mana = maxMana;
         }
         manaBar.setProgress(Math.max(0, mana) / maxMana);
     }
 
-    public void manaPreview(ItemStack item) {
+    public void updateManaPreviewBar(ItemStack item) {
         Stone stone = StoneholdersBase.getStoneFromItem(item);
         if(item == null || !hasStones()) {
             previewBar.removePlayer(player);
@@ -179,8 +180,8 @@ public class Stoneholder {
 
         if(stone == null) { //might still be holding a unique power item
             UniquePower uniquePower = stones.keySet().stream()
-                    .filter(s -> s.getUniquePowerMap().containsKey(item))
-                    .map(s -> s.getUniquePowerMap().get(item))
+                    .filter(s -> s.getUniquePowerByItem(item) != null)
+                    .map(s -> s.getUniquePowerByItem(item))
                     .findFirst().orElse(null);
             if(uniquePower == null) {
                 previewBar.removePlayer(player);
@@ -213,10 +214,9 @@ public class Stoneholder {
                 seconds * 20L);
     }
 
-    //Toggles the need for mana
     public boolean toggleManaRequired() {
         manaRequired = !manaRequired;
-        updateMana();
+        updateManaBar();
         return manaRequired;
     }
     //endregion

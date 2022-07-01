@@ -22,14 +22,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+
+import static io.github.nhoj1000.stoneholdersbase.StoneConstants.*;
 
 public final class StoneholdersBase extends JavaPlugin {
-    private static final Map<UUID, Stoneholder> stoneholderMap = new HashMap<>();
-    private static final Map<String, Stone> stoneNameMap = new HashMap<>();
-    private static final Map<ItemStack, Stone> stoneItemMap = new HashMap<>();
+    private static final Map<UUID, Stoneholder> STONEHOLDER_MAP = new HashMap<>();
+    private static final Map<String, Stone> STONE_ID_MAP = new HashMap<>();
+    private static final Map<ItemStack, Stone> STONE_ITEM_MAP = new HashMap<>();
 
     private static StoneholdersBase plugin;
 
@@ -57,7 +57,7 @@ public final class StoneholdersBase extends JavaPlugin {
         new BukkitRunnable() {
             @Override
             public void run() {
-                stoneholderMap.values().forEach(Stoneholder::regen);
+                STONEHOLDER_MAP.values().forEach(Stoneholder::regen);
             }
         }.runTaskTimer(this, 0L, 20L);
 
@@ -67,57 +67,61 @@ public final class StoneholdersBase extends JavaPlugin {
     @Override
     public void onDisable() {
         super.onDisable();
-        stoneholderMap.values().forEach(Stoneholder::clearStones);
+        STONEHOLDER_MAP.values().forEach(Stoneholder::clearStones);
     }
 
     //region Stone helper methods
     private void stoneSetup() {
-        Stone powerStone = new Stone(ChatColor.DARK_PURPLE + "Power stone", 1);
+        Stone powerStone = new Stone(POWER_ID, ChatColor.DARK_PURPLE, 1);
         powerStone.registerPowers(new PowerFireball(3), new Powerup());
         powerStone.registerUniquePowers(new PowerShield(10, 1.5));
         registerStone("power", powerStone);
 
-        Stone realityStone = new Stone(ChatColor.RED + "Reality stone", 2);
+        Stone realityStone = new Stone( REALITY_ID, ChatColor.RED, 2);
         realityStone.registerPowers(new TNTWand(30, 15), new Disguise(30, 5), new GenerateArrow(5));
         realityStone.registerUniquePowers(new GlassBow(300));
         registerStone("reality", realityStone);
 
-        Stone soulStone = new Stone(ChatColor.GOLD + "Soul stone", 3);
+        Stone soulStone = new Stone( SOUL_ID, ChatColor.GOLD, 3);
         soulStone.registerPowers(new Reveal(50), new AstralForm(5), new PsychOut(30));
         soulStone.registerPassivePowers(new SoulCollector(20, 1, 4, 8));
         registerStone("soul", soulStone);
 
-        Stone spaceStone = new Stone(ChatColor.BLUE + "Space stone", 4);
+        Stone spaceStone = new Stone( SPACE_ID, ChatColor.BLUE, 4);
         spaceStone.registerPowers(new Scatter(20, 100), new Dash(30), new Summon(12, 20));
         registerStone("space", spaceStone);
 
-        Stone timeStone = new Stone(ChatColor.GREEN + "Time stone", 5);
+        Stone timeStone = new Stone(TIME_ID, ChatColor.GREEN, 5);
         timeStone.registerPowers(new Checkpoint(10), new Pause(20, 5));
         timeStone.registerUniquePowers(new TimeShield(10, 2));
         registerStone("time", timeStone);
     }
 
     public void registerStone(String id, Stone stone) {
-        stoneNameMap.put(id, stone);
-        stoneItemMap.put(stone.getStoneItem(), stone);
+        STONE_ID_MAP.put(id, stone);
+        STONE_ITEM_MAP.put(stone.getStoneItem(), stone);
     }
 
-    public static Map<String, Stone> getStoneNameMap() {
-        return stoneNameMap;
+    public static Set<String> getAllStoneIds() {
+        return STONE_ID_MAP.keySet();
     }
 
-    public static Stone getStoneFromItem(ItemStack i) {
-        return stoneItemMap.get(i);
+    public static Set<Stone> getAllStones() {
+        return new HashSet<>(STONE_ID_MAP.values());
     }
 
-    public static Stone getStoneFromName(String id) {
-        return stoneNameMap.get(id);
+    public static Stone getStoneFromItem(ItemStack item) {
+        return STONE_ITEM_MAP.get(item);
+    }
+
+    public static Stone getStoneFromId(String id) {
+        return STONE_ID_MAP.get(id);
     }
     //endregion
 
     //region Stoneholder map methods
     public static Stoneholder getStoneholder(Player p) {
-        return stoneholderMap.get(p.getUniqueId());
+        return STONEHOLDER_MAP.get(p.getUniqueId());
     }
 
     public static boolean isStoneholder(Player p) {
@@ -125,9 +129,9 @@ public final class StoneholdersBase extends JavaPlugin {
     }
 
     public static void initializeStoneholder(Player p) {
-        Stoneholder stoneholder = stoneholderMap.get(p.getUniqueId());
+        Stoneholder stoneholder = STONEHOLDER_MAP.get(p.getUniqueId());
         if(stoneholder == null) {
-            stoneholderMap.put(p.getUniqueId(), new Stoneholder(p));
+            STONEHOLDER_MAP.put(p.getUniqueId(), new Stoneholder(p));
         } else {
             stoneholder.setPlayer(p);
             stoneholder.updateMaxMana();
