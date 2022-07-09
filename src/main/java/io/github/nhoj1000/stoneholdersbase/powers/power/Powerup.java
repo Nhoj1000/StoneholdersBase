@@ -1,5 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.powers.power;
 
+import io.github.nhoj1000.stoneholdersbase.StoneUtils;
 import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import io.github.nhoj1000.stoneholdersbase.Stone;
 import org.bukkit.Material;
@@ -27,7 +28,7 @@ public class Powerup implements Power {
 
     @Override
     public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.GOLDEN_SHOVEL, 1, "Powerup", Collections.singletonList(""));
+        return StoneUtils.generateStoneTool(Material.GOLDEN_SHOVEL, 1, "Powerup", Collections.singletonList(""));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package io.github.nhoj1000.stoneholdersbase.powers.soul;
 
 import io.github.nhoj1000.stoneholdersbase.Stone;
+import io.github.nhoj1000.stoneholdersbase.StoneUtils;
 import io.github.nhoj1000.stoneholdersbase.StoneholdersBase;
 import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import org.bukkit.Material;
@@ -22,12 +23,11 @@ public class PsychOut implements Power {
 
     @Override
     public boolean usePower(Player player) {
-        LivingEntity target = null;
-        for(Entity e: player.getNearbyEntities(range, range, range))
-            if(e instanceof LivingEntity && StoneholdersBase.isLookingAt(player, (LivingEntity) e)) {
-                target = (LivingEntity) e;
-                break;
-            }
+        Player target = player.getNearbyEntities(range, range, range).stream()
+                .filter(ent -> ent instanceof Player)
+                .map(ent -> (Player) ent)
+                .filter(p -> StoneUtils.isLookingAt(player, p))
+                .findFirst().orElse(null);
 
         if(target == null) {
             player.sendMessage("No target found!");
@@ -42,7 +42,7 @@ public class PsychOut implements Power {
 
     @Override
     public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.IRON_SHOVEL, 3, "Psych-out", Collections.singletonList(""));
+        return StoneUtils.generateStoneTool(Material.IRON_SHOVEL, 3, "Psych-out", Collections.singletonList(""));
     }
 
     @Override

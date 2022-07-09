@@ -1,5 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.powers.space;
 
+import io.github.nhoj1000.stoneholdersbase.StoneUtils;
 import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import io.github.nhoj1000.stoneholdersbase.Stone;
 import org.bukkit.ChatColor;
@@ -23,29 +24,26 @@ public class Dash implements Power {
     @Override
     public boolean usePower(Player player) {
         List<Block> target = player.getLastTwoTargetBlocks(null, dashDistance);
-        List<Entity> rider = player.getNearbyEntities(0.5, 1, 0.5);
-        Vector velocity = player.getVelocity();
-        Location destination;
+        List<Entity> riders = player.getNearbyEntities(0.5, 1, 0.5);
+        Vector velocity = player.getVelocity().clone();
 
-        if (target.get(1).getLocation().add(0, 1, 0).getBlock().getType().equals(Material.AIR) && target.get(1).getLocation().add(0, 2, 0).getBlock().getType().equals(Material.AIR))
-            destination = target.get(1).getLocation().add(0, 1, 0);
-        else
-            destination = target.get(0).getLocation().subtract(0, .5, 0);
-
+        Location destination = (target.get(1).getLocation().add(0, 1, 0).getBlock().getType().equals(Material.AIR)
+                             && target.get(1).getLocation().add(0, 2, 0).getBlock().getType().equals(Material.AIR))
+                        ? target.get(1).getLocation().add(0.5, 1.0, 0.5)
+                        : target.get(0).getLocation().subtract(0.5, 0.5, 0.5);
         destination.setDirection(player.getLocation().getDirection());
+        player.teleport(StoneUtils.worldBorderBound(destination));
         player.sendMessage(ChatColor.BLUE + "Whoosh!");
-        player.teleport(destination.add(0.5, 0, 0.5));
         player.setFallDistance(0);
         player.setVelocity(velocity);
 
-        if (!rider.isEmpty())
-            rider.get(0).teleport(player);
+        riders.forEach(rider -> rider.teleport(player));
         return true;
     }
 
     @Override
     public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.GOLDEN_SHOVEL, 4, "Dash", Collections.singletonList(""));
+        return StoneUtils.generateStoneTool(Material.GOLDEN_SHOVEL, 4, "Dash", Collections.singletonList(""));
     }
 
     @Override

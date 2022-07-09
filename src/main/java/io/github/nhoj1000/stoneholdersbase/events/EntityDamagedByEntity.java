@@ -14,8 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.meta.PotionMeta;
 
-import static io.github.nhoj1000.stoneholdersbase.StoneConstants.POWER_ID;
-import static io.github.nhoj1000.stoneholdersbase.StoneConstants.REALITY_ID;
+import static io.github.nhoj1000.stoneholdersbase.StoneConstants.*;
 
 public class EntityDamagedByEntity implements Listener{
     @EventHandler
@@ -42,11 +41,8 @@ public class EntityDamagedByEntity implements Listener{
         if(e.getEntity() instanceof Player) {
             Player p = (Player) e.getEntity();
             Stoneholder stoneholder = StoneholdersBase.getStoneholder(p);
-            System.out.println(stoneholder.hasStone(POWER_ID));
-            System.out.println(p.isBlocking());
-            System.out.println(p.isSneaking());
 
-            if(stoneholder.hasStone(POWER_ID) && p.isBlocking() && p.isSneaking()) {
+            if((stoneholder.hasStone(POWER_ID) || stoneholder.hasStone(TIME_ID)) && p.isBlocking() && p.isSneaking()) {
                 stoneholder.useUniquePower(p.getInventory().getItemInMainHand().getType() == Material.SHIELD
                         ? p.getInventory().getItemInMainHand()
                         : p.getInventory().getItemInOffHand());
@@ -55,7 +51,6 @@ public class EntityDamagedByEntity implements Listener{
     }
 
     private boolean isEntityDead(Entity e, double damage) {
-        return (e instanceof LivingEntity)
-                && (((LivingEntity) e).getHealth() - damage > 0);
+        return (e instanceof LivingEntity) && (((LivingEntity) e).getHealth() - damage > 0);
     }
 }

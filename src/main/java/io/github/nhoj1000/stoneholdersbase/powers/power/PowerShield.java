@@ -2,6 +2,7 @@ package io.github.nhoj1000.stoneholdersbase.powers.power;
 
 
 import io.github.nhoj1000.stoneholdersbase.Stone;
+import io.github.nhoj1000.stoneholdersbase.StoneUtils;
 import io.github.nhoj1000.stoneholdersbase.powers.UniquePower;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -28,9 +29,9 @@ public class PowerShield implements UniquePower {
             e.setVelocity(e.getLocation().subtract(player.getLocation())
                     .toVector()
                     .normalize()
+                    .add(new Vector(0, 1, 0))
                     .multiply(powerMultiplier)
-                    .multiply((radius - distance) * 0.5)
-                    .add(new Vector(0, 1, 0)));
+                    .multiply((radius - distance) * 0.5));
         });
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST_FAR, 100, 1);
         return true;
@@ -52,6 +53,6 @@ public class PowerShield implements UniquePower {
     }
 
     public static ItemStack getPowerShield() {
-        return Stone.generateStoneTool(Material.SHIELD, 1, "Power Shield", Collections.singletonList(""));
+        return StoneUtils.generateStoneTool(Material.SHIELD, 1, "Power Shield", Collections.singletonList(""));
     }
 }

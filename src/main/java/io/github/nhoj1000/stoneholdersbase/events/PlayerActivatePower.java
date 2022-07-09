@@ -1,6 +1,7 @@
 package io.github.nhoj1000.stoneholdersbase.events;
 
 import io.github.nhoj1000.stoneholdersbase.Stone;
+import io.github.nhoj1000.stoneholdersbase.StoneUtils;
 import io.github.nhoj1000.stoneholdersbase.Stoneholder;
 import io.github.nhoj1000.stoneholdersbase.StoneholdersBase;
 import io.github.nhoj1000.stoneholdersbase.powers.reality.GlassBow;
@@ -25,7 +26,8 @@ public class PlayerActivatePower implements Listener {
     @EventHandler
     public void onRightClick(PlayerInteractEvent e) {
         Player p = e.getPlayer();
-        if((e.getItem() != null && p.getCooldown(e.getItem().getType()) > 0)
+        ItemStack item = e.getItem();
+        if((item != null && p.getCooldown(e.getItem().getType()) > 0)
                 || (e.getClickedBlock() != null && ignoredBlocks.contains(e.getClickedBlock().getType()))) {
             return;
         }
@@ -33,16 +35,15 @@ public class PlayerActivatePower implements Listener {
         Stoneholder sh = StoneholdersBase.getStoneholder(p);
         if(sh.hasStones()) {
             if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                sh.useNormalPower(StoneholdersBase.getStoneFromItem(e.getItem()));
+                sh.useNormalPower(StoneUtils.getStoneFromItem(e.getItem()));
             } else {
                 //Handles power swapping for a given stone
                 //Also used for special items with left click function like the glass bow
-                ItemStack item = p.getInventory().getItemInMainHand();
-                Stone s = StoneholdersBase.getStoneFromItem(item);
+                Stone s = StoneUtils.getStoneFromItem(item);
 
                 if (s != null) {
                     sh.selectPowerGUI(s);
-                } else if (sh.hasStone(REALITY_ID) && item.equals(GlassBow.getGlassBow())) {
+                } else if (sh.hasStone(REALITY_ID) && GlassBow.getGlassBow().equals(item)) {
                     sh.useUniquePower(item);
                 }
             }

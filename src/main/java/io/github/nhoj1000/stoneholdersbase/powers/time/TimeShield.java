@@ -1,6 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.powers.time;
 
-import io.github.nhoj1000.stoneholdersbase.Stone;
+import io.github.nhoj1000.stoneholdersbase.StoneUtils;
 import io.github.nhoj1000.stoneholdersbase.powers.UniquePower;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -42,6 +42,6 @@ public class TimeShield implements UniquePower {
     }
 
     public static ItemStack getTimeShield() {
-        return Stone.generateStoneTool(Material.SHIELD, 5, "Time Shield", Collections.singletonList(""));
+        return StoneUtils.generateStoneTool(Material.SHIELD, 5, "Time Shield", Collections.singletonList(""));
     }
 }

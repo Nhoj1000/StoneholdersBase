@@ -1,5 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.powers.time;
 
+import io.github.nhoj1000.stoneholdersbase.StoneUtils;
 import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import io.github.nhoj1000.stoneholdersbase.Stone;
 import io.github.nhoj1000.stoneholdersbase.StoneholdersBase;
@@ -31,27 +32,29 @@ public class Pause implements Power {
         List<Entity> entities = player.getNearbyEntities(radius, radius, radius);
         Map<Entity, Vector> speeds = new HashMap<>();
 
-        for (Entity e : entities) {
-            if (e instanceof LivingEntity)
+        entities.forEach(e -> {
+            if (e instanceof LivingEntity) {
                 ((LivingEntity) e).setAI(false);
-            if(e instanceof Player)
+            } else if(e instanceof Player) {
                 ((Player) e).setAllowFlight(true);
+            }
             frozenEntities.add(e);
             speeds.put(e, e.getVelocity());
             e.setVelocity(new Vector(0, 0, 0));
             e.setGravity(false);
-        }
+        });
 
         Bukkit.getScheduler().runTaskLater(StoneholdersBase.getInstance(), () -> {
-            for (Entity e : entities) {
-                e.setGravity(true);
-                if (e instanceof LivingEntity)
+            entities.forEach(e ->  {
+                if (e instanceof LivingEntity) {
                     ((LivingEntity) e).setAI(true);
-                if(e instanceof Player)
+                } else if(e instanceof Player) {
                     ((Player) e).setAllowFlight(((Player) e).getGameMode() != GameMode.SURVIVAL);
+                }
                 frozenEntities.remove(e);
                 e.setVelocity(speeds.remove(e));
-            }
+                e.setGravity(true);
+            });
             player.sendMessage(ChatColor.GREEN + "Time Pause deactivated!");
         }, time * 20L);
         return true;
@@ -59,7 +62,7 @@ public class Pause implements Power {
 
     @Override
     public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.GOLDEN_SHOVEL, 5, "Pause", Collections.singletonList(""));
+        return StoneUtils.generateStoneTool(Material.GOLDEN_SHOVEL, 5, "Pause", Collections.singletonList(""));
     }
 
     @Override
@@ -68,10 +71,11 @@ public class Pause implements Power {
     }
 
     public static void setFrozen(Entity e, boolean frozen) {
-        if(frozen)
+        if(frozen) {
             frozenEntities.add(e);
-        else
+        } else {
             frozenEntities.remove(e);
+        }
     }
 
     public static boolean isFrozen(Entity e) {

@@ -34,22 +34,9 @@ public class Stone {
         return items;
     }
 
-    public static ItemStack generateStoneTool(Material m, int d, String name, List<String> lore) {
-        ItemStack stoneTool = new ItemStack(m);
-        ItemMeta meta = stoneTool.getItemMeta();
-        meta.setUnbreakable(true);
-        meta.setDisplayName(name);
-        meta.setLore(lore);
-        if(meta instanceof Damageable)
-            ((Damageable)meta).setDamage(d);
-        stoneTool.setItemMeta(meta);
-
-        return stoneTool;
-    }
-
     //returns physical item representing the stone
     public ItemStack getStoneItem() {
-        return Stone.generateStoneTool(Material.WOODEN_SWORD, damageID, stoneId, Collections.singletonList(""));
+        return StoneUtils.generateStoneTool(Material.WOODEN_SWORD, damageID, getDisplayName(), Collections.singletonList(""));
     }
 
     //region Power registry

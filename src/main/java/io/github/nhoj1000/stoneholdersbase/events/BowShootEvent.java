@@ -1,5 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.events;
 
+import io.github.nhoj1000.stoneholdersbase.StoneUtils;
 import io.github.nhoj1000.stoneholdersbase.Stoneholder;
 import io.github.nhoj1000.stoneholdersbase.StoneholdersBase;
 import io.github.nhoj1000.stoneholdersbase.powers.reality.GlassBow;
@@ -16,7 +17,7 @@ public class BowShootEvent implements Listener {
     public void onShoot(EntityShootBowEvent e) {
         if(e.getEntity() instanceof Player) {
             Player p = (Player) e.getEntity();
-            if(StoneholdersBase.getStoneholder(p).hasStones() && StoneholdersBase.comparePowerItems(e.getConsumable(), GlassBow.getGlassArrow())) {
+            if(StoneholdersBase.getStoneholder(p).hasStones() && StoneUtils.comparePowerItems(e.getConsumable(), GlassBow.getGlassArrow())) {
                 GlassBow.setTarget(p, e.getProjectile(), false);
                 ((Arrow) e.getProjectile()).setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
             }

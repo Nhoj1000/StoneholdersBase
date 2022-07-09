@@ -39,22 +39,23 @@ public class SoulCollector implements PassivePower {
             p.setHealth(Math.min(p.getHealth() + 4, 20));
             p.sendMessage(ChatColor.GOLD + "Soul of " + soulTarget.getName() + " collected. " + souls + " total souls.");
 
-            if(souls == lvl1) {
-                p.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-                p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 0));
-            } else if(souls == lvl2) {
-                p.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-                p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 1));
-            } else if(souls == lvl3) {
+            if(souls >= lvl3) {
                 p.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
                 p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 2));
+            } else if(souls >= lvl2) {
+                p.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+                p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 1));
+            } else if(souls >= lvl1) {
+                p.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+                p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 0));
             }
         }
     }
 
     public static void clearSouls(Player p) {
-        if(soulCount.containsKey(p.getUniqueId()))
+        if(soulCount.containsKey(p.getUniqueId())) {
             soulCount.put(p.getUniqueId(), 0);
+        }
     }
 
     public static int getCollectionRadius() {

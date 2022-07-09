@@ -1,5 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.powers.space;
 
+import io.github.nhoj1000.stoneholdersbase.StoneUtils;
 import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import io.github.nhoj1000.stoneholdersbase.Stone;
 import org.bukkit.Location;
@@ -23,15 +24,12 @@ public class Scatter implements Power {
     @Override
     public boolean usePower(Player player) {
         World world = player.getWorld();
-        Location center = world.getWorldBorder().getCenter();
-        int size = (int) world.getWorldBorder().getSize();
 
         player.getNearbyEntities(grabRange, grabRange, grabRange).forEach(e -> {
-            int randX = limit(player.getLocation().getBlockX() - scatterRange/2 + random.nextInt(scatterRange),
-                    center.getBlockX() - size/2, center.getBlockX() + size/2);
-            int randZ = limit(player.getLocation().getBlockZ() - scatterRange/2 + random.nextInt(scatterRange),
-                    center.getBlockZ() - size/2, center.getBlockZ() + size/2);
-            e.teleport(new Location(world, randX, world.getHighestBlockYAt(randX, randZ) + 1, randZ));
+            int randX = player.getLocation().getBlockX() - scatterRange/2 + random.nextInt(scatterRange);
+            int randZ = player.getLocation().getBlockZ() - scatterRange/2 + random.nextInt(scatterRange);
+            Location randLoc = new Location(world, randX, world.getHighestBlockYAt(randX, randZ) + 1, randZ);
+            e.teleport(StoneUtils.worldBorderBound(randLoc));
         });
 
         return true;
@@ -39,11 +37,7 @@ public class Scatter implements Power {
 
     @Override
     public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.DIAMOND_SHOVEL, 4, "Scatter", Collections.singletonList(""));
-    }
-
-    private int limit(int i, int min, int max) {
-        return Math.max(min, Math.min(i, max));
+        return StoneUtils.generateStoneTool(Material.DIAMOND_SHOVEL, 4, "Scatter", Collections.singletonList(""));
     }
 
     @Override

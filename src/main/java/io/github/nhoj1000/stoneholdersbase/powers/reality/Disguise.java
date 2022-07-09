@@ -1,5 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.powers.reality;
 
+import io.github.nhoj1000.stoneholdersbase.StoneUtils;
 import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import io.github.nhoj1000.stoneholdersbase.Stone;
 import io.github.nhoj1000.stoneholdersbase.StoneholdersBase;
@@ -19,6 +20,12 @@ public class Disguise implements Power {
     private final int range, maxTime;
     private static final Map<UUID, DisguisedUser> disguisedUsers = new HashMap<>();
 
+    private static class DisguisedUser{
+        public Block block;
+        public Material material;
+        public BukkitTask task;
+    }
+
     public Disguise(int range, int maxTime) {
         this.range = range;
         this.maxTime = maxTime;
@@ -37,15 +44,15 @@ public class Disguise implements Power {
             player.setVelocity(new Vector());
             player.getWorld().playSound(player.getLocation(), Sound.UI_TOAST_OUT, 10, 1.2f);
 
-            DisguisedUser user = new DisguisedUser();
-            user.block = player.getWorld().getBlockAt(player.getLocation());
-            user.material = user.block.getType();
-            user.block.setType(target.getType());
-            player.teleport(user.block.getLocation().add(0.5, 0.5, 0.5)
+            DisguisedUser disguisedUser = new DisguisedUser();
+            disguisedUser.block = player.getWorld().getBlockAt(player.getLocation());
+            disguisedUser.material = disguisedUser.block.getType();
+            disguisedUser.block.setType(target.getType());
+            player.teleport(disguisedUser.block.getLocation().add(0.5, 0.5, 0.5)
                     .setDirection(player.getLocation().getDirection()));
-            user.task = Bukkit.getScheduler().runTaskLater(StoneholdersBase.getInstance(),
+            disguisedUser.task = Bukkit.getScheduler().runTaskLater(StoneholdersBase.getInstance(),
                     () -> unDisguise(player), maxTime * 20L);
-            disguisedUsers.put(player.getUniqueId(), user);
+            disguisedUsers.put(player.getUniqueId(), disguisedUser);
             return true;
         } else {
             unDisguise(player);
@@ -64,13 +71,7 @@ public class Disguise implements Power {
 
     @Override
     public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.GOLDEN_SHOVEL, 2, "Disguise", Collections.singletonList(""));
-    }
-
-    private static class DisguisedUser{
-        public Block block;
-        public Material material;
-        public BukkitTask task;
+        return StoneUtils.generateStoneTool(Material.GOLDEN_SHOVEL, 2, "Disguise", Collections.singletonList(""));
     }
 
     @Override

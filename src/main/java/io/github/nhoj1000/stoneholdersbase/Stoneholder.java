@@ -123,7 +123,7 @@ public class Stoneholder {
             stones.remove(stone);
             actionBarMessage("Lost " + stone.getDisplayName());
             stone.getPlayerItems().forEach(i -> Arrays.stream(player.getInventory().getContents())
-                    .filter(pi -> StoneholdersBase.comparePowerItems(i, pi))
+                    .filter(pi -> StoneUtils.comparePowerItems(i, pi))
                     .forEach(pi -> player.getInventory().removeItem(pi)));
             stone.getPassivePowerSet().forEach(pp -> pp.deactivatePower(player));
             updateManaPreviewBar(player.getInventory().getItemInMainHand());
@@ -135,7 +135,7 @@ public class Stoneholder {
     public void clearStones() {
         List<String> stoneIds = getStones().stream().map(Stone::toString).collect(Collectors.toList());
         for(String stoneName: stoneIds) { //to avoid ConcurrentModificationException
-            removeStone(StoneholdersBase.getStoneFromId(stoneName));
+            removeStone(StoneUtils.getStoneFromId(stoneName));
         }
     }
 
@@ -148,7 +148,7 @@ public class Stoneholder {
     }
 
     public boolean hasStone(String stoneName) {
-        return hasStone(StoneholdersBase.getStoneFromId(stoneName));
+        return hasStone(StoneUtils.getStoneFromId(stoneName));
     }
 
     public boolean hasStone(Stone stone) {
@@ -173,7 +173,7 @@ public class Stoneholder {
     }
 
     public void updateManaPreviewBar(ItemStack item) {
-        Stone stone = StoneholdersBase.getStoneFromItem(item);
+        Stone stone = StoneUtils.getStoneFromItem(item);
         if(item == null || !hasStones()) {
             previewBar.removePlayer(player);
         }

@@ -1,8 +1,11 @@
 package io.github.nhoj1000.stoneholdersbase.powers.space;
 
+import io.github.nhoj1000.stoneholdersbase.StoneUtils;
 import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import io.github.nhoj1000.stoneholdersbase.Stone;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
@@ -14,6 +17,9 @@ import java.util.*;
 
 public class Summon implements Power {
     private final int numZombies, spawnRange;
+    private final Random random = new Random();
+
+    private static final String ZOMBIE_NAME = "Space Zombie";
 
     public Summon(int numZombies, int spawnRange) {
         this.numZombies = numZombies;
@@ -22,24 +28,25 @@ public class Summon implements Power {
 
     @Override
     public boolean usePower(Player player) {
-        Random random = new Random();
-        int randX, randZ;
+        World world = player.getWorld();
+        Location playerLoc = player.getLocation();
         for (int i = 0; i < numZombies; i++) {
-            randX = random.nextInt(spawnRange);
-            randZ = random.nextInt(spawnRange);
-            Zombie target = (Zombie) player.getWorld().spawnEntity(player.getLocation()
-                    .add(randX - spawnRange/2F, 100, randZ - spawnRange/2F), EntityType.ZOMBIE);
+            int randX = playerLoc.getBlockX() - spawnRange/2 + random.nextInt(spawnRange);
+            int randZ = playerLoc.getBlockZ() - spawnRange/2 + random.nextInt(spawnRange);
+            Location randLoc = new Location(world, randX, playerLoc.getY() + 100, randZ);
+
+            Zombie target = (Zombie) player.getWorld().spawnEntity(StoneUtils.worldBorderBound(randLoc), EntityType.ZOMBIE);
             target.getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
             target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
             target.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 1));
-            target.setCustomName(getZombieName());
+            target.setCustomName(ZOMBIE_NAME);
         }
         return true;
     }
 
     @Override
     public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.STONE_SHOVEL, 4, "Summon", Collections.singletonList(""));
+        return StoneUtils.generateStoneTool(Material.STONE_SHOVEL, 4, "Summon", Collections.singletonList(""));
     }
 
     @Override
@@ -48,6 +55,6 @@ public class Summon implements Power {
     }
 
     public static String getZombieName() {
-        return "Space Zombie";
+        return ZOMBIE_NAME;
     }
 }

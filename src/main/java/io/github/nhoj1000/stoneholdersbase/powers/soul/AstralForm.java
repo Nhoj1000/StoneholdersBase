@@ -1,5 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.powers.soul;
 
+import io.github.nhoj1000.stoneholdersbase.StoneUtils;
 import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import io.github.nhoj1000.stoneholdersbase.Stone;
 import io.github.nhoj1000.stoneholdersbase.StoneholdersBase;
@@ -27,7 +28,7 @@ public class AstralForm implements Power {
         place.setCustomName(player.getName());
         place.setCustomNameVisible(true);
         place.getEquipment().setArmorContents(player.getEquipment().getArmorContents());
-        place.getEquipment().setHelmet(StoneholdersBase.getPlayerHead(player));
+        place.getEquipment().setHelmet(StoneUtils.getPlayerHead(player));
         place.setVelocity(player.getVelocity());
         place.setAware(false);
         place.setSilent(true);
@@ -54,7 +55,7 @@ public class AstralForm implements Power {
 
     @Override
     public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.GOLDEN_SHOVEL, 3, "Astral Form", Collections.singletonList(""));
+        return StoneUtils.generateStoneTool(Material.GOLDEN_SHOVEL, 3, "Astral Form", Collections.singletonList(""));
     }
 
     @Override

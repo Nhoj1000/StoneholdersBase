@@ -1,5 +1,6 @@
 package io.github.nhoj1000.stoneholdersbase.powers.reality;
 
+import io.github.nhoj1000.stoneholdersbase.StoneUtils;
 import io.github.nhoj1000.stoneholdersbase.powers.Power;
 import io.github.nhoj1000.stoneholdersbase.Stone;
 import org.bukkit.ChatColor;
@@ -25,22 +26,21 @@ public class TNTWand implements Power {
     @Override
     public boolean usePower(Player player) {
         Block block = player.getTargetBlockExact(range);
-        if(block == null)
+        if(block == null) {
             player.sendMessage(ChatColor.RED + "Block out of range!");
-        else {
-            block.setType(Material.AIR);
-            TNTPrimed tnt = (TNTPrimed) player.getWorld().spawnEntity(block.getLocation().add(0.5, 0, 0.5), EntityType.PRIMED_TNT);
-            tnt.setFuseTicks(100);
-            tnt.setYield(yield);
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, 2, 1);
-            return true;
+            return false;
         }
-        return false;
+        block.setType(Material.AIR);
+        TNTPrimed tnt = (TNTPrimed) player.getWorld().spawnEntity(block.getLocation().add(0.5, 0, 0.5), EntityType.PRIMED_TNT);
+        tnt.setFuseTicks(100);
+        tnt.setYield(yield);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, 2, 1);
+        return true;
     }
 
     @Override
     public ItemStack getTool() {
-        return Stone.generateStoneTool(Material.DIAMOND_SHOVEL, 2, "TNT Wand", Collections.singletonList(""));
+        return StoneUtils.generateStoneTool(Material.DIAMOND_SHOVEL, 2, "TNT Wand", Collections.singletonList(""));
     }
 
     @Override

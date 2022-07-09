@@ -1,6 +1,7 @@
 package io.github.nhoj1000.stoneholdersbase.commands;
 
 import io.github.nhoj1000.stoneholdersbase.Stone;
+import io.github.nhoj1000.stoneholdersbase.StoneUtils;
 import io.github.nhoj1000.stoneholdersbase.Stoneholder;
 import io.github.nhoj1000.stoneholdersbase.StoneholdersBase;
 import org.bukkit.Bukkit;
@@ -51,7 +52,7 @@ public class StoneSetCommand implements TabExecutor {
     public boolean addStone(CommandSender sender, Stoneholder stoneholder, String[] args) {
         if(args.length < 3) {return false;}
 
-        Stone stone = StoneholdersBase.getStoneFromId(args[2]);
+        Stone stone = StoneUtils.getStoneFromId(args[2]);
         if(stone == null) {
             sender.sendMessage(args[2] + " is not a valid stone.");
             return true;
@@ -69,7 +70,7 @@ public class StoneSetCommand implements TabExecutor {
     public boolean removeStone(CommandSender sender, Stoneholder stoneholder, String[] args) {
         if(args.length < 3) {return false;}
 
-        Stone stone = StoneholdersBase.getStoneFromId(args[2]);
+        Stone stone = StoneUtils.getStoneFromId(args[2]);
         if(stone == null) {
             sender.sendMessage(args[2] + " is not a valid stone.");
             return true;
@@ -100,7 +101,7 @@ public class StoneSetCommand implements TabExecutor {
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         return switch (args.length) {
             case 1 -> trimList(Arrays.asList("add", "remove", "clear", "list"), args[0]);
-            case 3 -> trimList(new ArrayList<>(StoneholdersBase.getAllStoneIds()), args[2]);
+            case 3 -> trimList(new ArrayList<>(StoneUtils.getAllStoneIds()), args[2]);
             default -> null;
         };
     }
