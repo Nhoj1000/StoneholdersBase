@@ -72,33 +72,45 @@ public final class StoneholdersBase extends JavaPlugin {
 
     //region Stone helper methods
     private void stoneSetup() {
-        Stone powerStone = new Stone(POWER_ID, ChatColor.DARK_PURPLE, 1);
-        powerStone.registerPowers(new PowerFireball(3), new Powerup());
-        powerStone.registerUniquePowers(new PowerShield(10, 1.5));
-        registerStone("power", powerStone);
+        registerStone(new Stone(POWER_ID, ChatColor.DARK_PURPLE, 1)
+                .registerPowers(
+                        new PowerFireball(3),
+                        new Powerup())
+                .registerUniquePowers(
+                        new PowerShield(10, 1.5)));
 
-        Stone realityStone = new Stone( REALITY_ID, ChatColor.RED, 2);
-        realityStone.registerPowers(new TNTWand(30, 15), new Disguise(30, 5), new GenerateArrow(5));
-        realityStone.registerUniquePowers(new GlassBow(300));
-        registerStone("reality", realityStone);
+        registerStone(new Stone(REALITY_ID, ChatColor.RED, 2)
+                .registerPowers(
+                        new TNTWand(30, 15),
+                        new Disguise(30, 5),
+                        new GenerateArrow(5))
+                .registerUniquePowers(
+                        new GlassBow(300)));
 
-        Stone soulStone = new Stone( SOUL_ID, ChatColor.GOLD, 3);
-        soulStone.registerPowers(new Reveal(50), new AstralForm(5), new PsychOut(30));
-        soulStone.registerPassivePowers(new SoulCollector(20, 1, 4, 8));
-        registerStone("soul", soulStone);
+        registerStone(new Stone(SOUL_ID, ChatColor.GOLD, 3)
+                .registerPowers(
+                        new Reveal(50),
+                        new AstralForm(5),
+                        new PsychOut(30))
+                .registerPassivePowers(
+                        new SoulCollector(20, 1, 4, 8)));
 
-        Stone spaceStone = new Stone( SPACE_ID, ChatColor.BLUE, 4);
-        spaceStone.registerPowers(new Scatter(20, 100), new Dash(30), new Summon(12, 20));
-        registerStone("space", spaceStone);
+        registerStone(new Stone(SPACE_ID, ChatColor.BLUE, 4)
+                .registerPowers(
+                        new Scatter(20, 100),
+                        new Dash(30),
+                        new Summon(12, 20)));
 
-        Stone timeStone = new Stone(TIME_ID, ChatColor.GREEN, 5);
-        timeStone.registerPowers(new Checkpoint(10), new Pause(20, 5));
-        timeStone.registerUniquePowers(new TimeShield(10, 2));
-        registerStone("time", timeStone);
+        registerStone(new Stone(TIME_ID, ChatColor.GREEN, 5)
+                .registerPowers(
+                        new Checkpoint(10),
+                        new Pause(20, 5))
+                .registerUniquePowers(
+                        new TimeShield(10, 2)));
     }
 
-    public void registerStone(String id, Stone stone) {
-        STONE_ID_MAP.put(id, stone);
+    public void registerStone(Stone stone) {
+        STONE_ID_MAP.put(stone.getId(), stone);
         STONE_ITEM_MAP.put(stone.getStoneItem(), stone);
     }
 
@@ -122,10 +134,6 @@ public final class StoneholdersBase extends JavaPlugin {
     //region Stoneholder map methods
     public static Stoneholder getStoneholder(Player p) {
         return STONEHOLDER_MAP.get(p.getUniqueId());
-    }
-
-    public static boolean isStoneholder(Player p) {
-        return getStoneholder(p).hasStones();
     }
 
     public static void initializeStoneholder(Player p) {
@@ -161,12 +169,15 @@ public final class StoneholdersBase extends JavaPlugin {
 
         ItemMeta m1 = i1.getItemMeta();
         ItemMeta m2 = i2.getItemMeta();
-        if(m1 == null && m2 == null) return true;
-        if(m1 == null || m2 == null) return false;
-        if(!m1.getDisplayName().equals(m2.getDisplayName())) return false;
-        if(m1.getLore() != null && m2.getLore() != null && !m1.getLore().equals(m2.getLore())) return false;
-        if(m1 instanceof Damageable && m2 instanceof Damageable && ((Damageable) m1).getDamage() != ((Damageable) m2).getDamage()) return false;
-        return (m1.isUnbreakable() == m2.isUnbreakable());
+        if(m1 == m2) {return true;}
+        if(!(m1 instanceof Damageable && m2 instanceof Damageable)) {return false;}
+
+        Damageable d1 = (Damageable) m1;
+        Damageable d2 = (Damageable) m2;
+        if(!d1.getDisplayName().equals(d2.getDisplayName())) {return false;}
+        if(d1.getLore() != null && d2.getLore() != null && !d1.getLore().equals(d2.getLore())) {return false;}
+        if(d1.getDamage() != d2.getDamage()) {return false;}
+        return (d1.isUnbreakable() == d2.isUnbreakable());
     }
 
     //Helper method to determine if one player is looking at another

@@ -16,7 +16,7 @@ public class BowShootEvent implements Listener {
     public void onShoot(EntityShootBowEvent e) {
         if(e.getEntity() instanceof Player) {
             Player p = (Player) e.getEntity();
-            if(StoneholdersBase.isStoneholder(p) && StoneholdersBase.comparePowerItems(e.getConsumable(), GlassBow.getGlassArrow())) {
+            if(StoneholdersBase.getStoneholder(p).hasStones() && StoneholdersBase.comparePowerItems(e.getConsumable(), GlassBow.getGlassArrow())) {
                 GlassBow.setTarget(p, e.getProjectile(), false);
                 ((Arrow) e.getProjectile()).setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
             }

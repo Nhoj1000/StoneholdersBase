@@ -53,17 +53,19 @@ public class Stone {
     }
 
     //region Power registry
-    public void registerPowers(Power... powers) {
+    public Stone registerPowers(Power... powers) {
         powerSet.addAll(Arrays.asList(powers));
+        return this;
     }
 
-    public void registerUniquePowers(UniquePower... powers) {
-        for(UniquePower up: powers)
-            uniquePowerMap.put(up.getActivationItem(), up);
+    public Stone registerUniquePowers(UniquePower... powers) {
+        Arrays.stream(powers).forEach(up -> uniquePowerMap.put(up.getActivationItem(), up));
+        return this;
     }
 
-    public void registerPassivePowers(PassivePower... powers) {
-        Collections.addAll(passivePowerSet, powers);
+    public Stone registerPassivePowers(PassivePower... powers) {
+        passivePowerSet.addAll(Arrays.asList(powers));
+        return this;
     }
     //endregion
 
@@ -90,8 +92,7 @@ public class Stone {
         return colorCode + stoneId + " Stone";
     }
 
-    @Override
-    public String toString() {
+    public String getId() {
         return stoneId;
     }
     //endregion
