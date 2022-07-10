@@ -27,14 +27,20 @@ public class Dash implements Power {
         List<Entity> riders = player.getNearbyEntities(0.5, 1, 0.5);
         Vector velocity = player.getVelocity().clone();
 
-        Location destination = (target.get(1).getLocation().add(0, 1, 0).getBlock().getType().equals(Material.AIR)
-                             && target.get(1).getLocation().add(0, 2, 0).getBlock().getType().equals(Material.AIR))
-                        ? target.get(1).getLocation().add(0.5, 1.0, 0.5)
-                        : target.get(0).getLocation().subtract(0.5, 0.5, 0.5);
+        Location destination;
+
+        if(isDashSafe(target.get(1).getLocation().add(0, 1, 0).getBlock())) {
+            destination = target.get(1).getLocation().add(0.5, 1.0, 0.5);
+        } else if (isDashSafe(target.get(0))){
+            destination = target.get(0).getLocation().add(0.5, 0, 0.5);
+        } else {
+            player.sendMessage("Invalid dash location");
+            return false;
+        }
+
         destination.setDirection(player.getLocation().getDirection());
         player.teleport(StoneUtils.worldBorderBound(destination));
-        player.sendMessage(ChatColor.BLUE + "Whoosh!");
-        player.setFallDistance(0);
+        player.setFallDistance(player.getFallDistance()/2);
         player.setVelocity(velocity);
 
         riders.forEach(rider -> rider.teleport(player));
@@ -49,5 +55,11 @@ public class Dash implements Power {
     @Override
     public int getManaCost() {
         return 35;
+    }
+
+    //return if a given block and it's headspace block aren't solid
+    private boolean isDashSafe(Block dashTarget) {
+        return !dashTarget.getLocation().add(0, 0, 0).getBlock().getType().isSolid()
+                && !dashTarget.getLocation().add(0, 1, 0).getBlock().getType().isSolid();
     }
 }

@@ -34,17 +34,16 @@ public class PlayerActivatePower implements Listener {
 
         Stoneholder sh = StoneholdersBase.getStoneholder(p);
         if(sh.hasStones()) {
-            if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            if (e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK) {
                 sh.useNormalPower(StoneUtils.getStoneFromItem(e.getItem()));
-            } else {
-                //Handles power swapping for a given stone
-                //Also used for special items with left click function like the glass bow
+                if (sh.hasStone(REALITY_ID) && GlassBow.getGlassBow().equals(item)) {
+                    sh.useUniquePower(item);
+                }
+            } else {//Handles power swapping for a given stone
                 Stone s = StoneUtils.getStoneFromItem(item);
 
                 if (s != null) {
                     sh.selectPowerGUI(s);
-                } else if (sh.hasStone(REALITY_ID) && GlassBow.getGlassBow().equals(item)) {
-                    sh.useUniquePower(item);
                 }
             }
         }

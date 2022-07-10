@@ -57,13 +57,11 @@ public class Stoneholder {
     }
 
     public void useUniquePower(ItemStack item) {
-        UniquePower p = null;
-        for(Stone s: getStones()) {
-            p = s.getUniquePowerByItem(item);
-            if(p != null) {
-                break;
-            }
-        }
+        UniquePower p = getStones().stream()
+                .map(s -> s.getUniquePowerByItem(item))
+                .filter(Objects::nonNull)
+                .findFirst().orElse(null);
+
         if(p != null && mana >= p.getManaCost()) {
             player.setCooldown(item.getType(), 10);
             if(p.usePower(player)) {
@@ -133,10 +131,7 @@ public class Stoneholder {
     }
 
     public void clearStones() {
-        List<String> stoneIds = getStones().stream().map(Stone::toString).collect(Collectors.toList());
-        for(String stoneName: stoneIds) { //to avoid ConcurrentModificationException
-            removeStone(StoneUtils.getStoneFromId(stoneName));
-        }
+        StoneUtils.getAllStones().forEach(this::removeStone);
     }
 
     public Set<Stone> getStones() {

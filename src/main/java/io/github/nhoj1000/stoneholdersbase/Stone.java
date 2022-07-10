@@ -76,7 +76,7 @@ public class Stone {
 
     //region Display bits
     public String getDisplayName() {
-        return colorCode + stoneId + " Stone";
+        return colorCode + stoneId.substring(0, 1).toUpperCase() + stoneId.substring(1) + " Stone";
     }
 
     public String getId() {

@@ -1,6 +1,7 @@
 package io.github.nhoj1000.stoneholdersbase.events;
 
 import io.github.nhoj1000.stoneholdersbase.Stone;
+import io.github.nhoj1000.stoneholdersbase.Stoneholder;
 import io.github.nhoj1000.stoneholdersbase.StoneholdersBase;
 import io.github.nhoj1000.stoneholdersbase.powers.UniquePower;
 import io.github.nhoj1000.stoneholdersbase.powers.soul.SoulCollector;
@@ -37,15 +38,21 @@ public class PlayerDeath implements Listener {
             }, 1L);
             Pause.setFrozen(player, true);
         } else {
+            Stoneholder stoneholder = StoneholdersBase.getStoneholder(player);
+
             //soul collection code
             player.getNearbyEntities(collectionRadius, collectionRadius, collectionRadius).stream()
                     .filter(ent -> ent instanceof Player)
                     .forEach(ent -> SoulCollector.addSoul((Player) ent, player));
 
             //filters out item drops for stone power items
-            StoneholdersBase.getStoneholder(player).getStones().stream()
+            stoneholder.getStones().stream()
                     .flatMap(s -> s.getUniquePowerSet().stream())
                     .forEach(up -> e.getDrops().removeAll(up.getItems()));
+
+            if(!e.getKeepInventory()) {
+                stoneholder.clearStones();
+            }
         }
     }
 }

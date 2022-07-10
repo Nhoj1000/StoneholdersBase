@@ -73,7 +73,7 @@ public final class StoneholdersBase extends JavaPlugin {
     }
 
     public static Stoneholder getStoneholder(Player p) {
-        return STONEHOLDER_MAP.get(p.getUniqueId());
+        return (p == null) ? null : STONEHOLDER_MAP.get(p.getUniqueId());
     }
 
     public static void initializeStoneholder(Player p) {

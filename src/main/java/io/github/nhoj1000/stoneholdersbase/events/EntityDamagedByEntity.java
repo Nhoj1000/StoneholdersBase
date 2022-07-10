@@ -51,6 +51,6 @@ public class EntityDamagedByEntity implements Listener{
     }
 
     private boolean isEntityDead(Entity e, double damage) {
-        return (e instanceof LivingEntity) && (((LivingEntity) e).getHealth() - damage > 0);
+        return (e instanceof LivingEntity) && (((LivingEntity) e).getHealth() - damage <= 0);
     }
 }

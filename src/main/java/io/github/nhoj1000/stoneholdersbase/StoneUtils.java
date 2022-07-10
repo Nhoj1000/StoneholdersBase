@@ -99,6 +99,6 @@ public class StoneUtils {
         double xCoord = Math.max(center.getX() - size/2, Math.min(loc.getX(), center.getX() + size/2));
         double zCoord = Math.max(center.getZ() - size/2, Math.min(loc.getZ(), center.getZ() + size/2));
 
-        return new Location(world, xCoord, loc.getY(), zCoord);
+        return new Location(world, xCoord, loc.getY(), zCoord).setDirection(loc.getDirection());
     }
 }

@@ -34,12 +34,13 @@ public class GlassBow implements UniquePower {
         if(temp != null) {
             Entity targetEntity = temp.entity;
             temp.task.cancel();
-            targetMap.put(player.getUniqueId(), null);
+            targetMap.remove(player.getUniqueId());
             generateSphere(targetEntity.getLocation(), 4, Material.GLASS);
-            player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 10, 1);
+            targetEntity.getWorld().playSound(targetEntity.getLocation(), Sound.BLOCK_GLASS_BREAK, 10, 1);
 
-            if(targetEntity instanceof Arrow)
+            if(targetEntity instanceof Arrow) {
                 targetEntity.remove();
+            }
             return true;
         }
         return false;
